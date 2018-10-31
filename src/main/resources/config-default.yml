@@ -5,6 +5,7 @@ archivator:
     format: zip
   workingtmp: workdir
   strategy: safty
+  maxBackupsBeforeErase: 5
   report:
     enabled: true
   sources:

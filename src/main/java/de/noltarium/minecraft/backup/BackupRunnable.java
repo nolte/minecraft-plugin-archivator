@@ -15,7 +15,6 @@ import de.noltarium.minecraft.backup.strategy.AbstractBackupStrategy;
 import de.noltarium.minecraft.backup.strategy.DirectBackupStrategy;
 import de.noltarium.minecraft.backup.strategy.SaftyBackupStrategy;
 import de.noltarium.minecraft.chat.ChatNotification;
-import de.noltarium.minecraft.config.ArchivatorConfigurationFacade;
 
 public class BackupRunnable implements Runnable {
 
@@ -43,14 +42,15 @@ public class BackupRunnable implements Runnable {
 		AbstractBackupStrategy<?> backupStrategy = null;
 		switch (type) {
 		case DIRECT:
-			ArchiveBaseFolderPreparation folderPrep = new ArchiveBaseFolderPreparation(config.getBackupArchivePath());
+			ArchiveBaseFolderPreparation folderPrep = new ArchiveBaseFolderPreparation(config.getBackupArchivePath(),
+					config.getMaxKeepedBackups());
 			ArchivingStep archiving = new ArchivingStep(folderPrep, config.getArchiveType());
 
 			backupStrategy = new DirectBackupStrategy(archiveId, backupSources, archiving, folderPrep);
 			break;
 		case SAFTY:
 			ArchiveTempBaseFolderPreparation folderTmpPrep = new ArchiveTempBaseFolderPreparation(
-					config.getBackupArchivePath(), config.getBackupWorkingPath());
+					config.getBackupArchivePath(), config.getBackupWorkingPath(), config.getMaxKeepedBackups());
 			ArchivingStep archivingWithTmp = new ArchivingStep(folderTmpPrep, config.getArchiveType());
 			backupStrategy = new SaftyBackupStrategy(archiveId, backupSources, archivingWithTmp, folderTmpPrep);
 			break;

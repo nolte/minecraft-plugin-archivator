@@ -66,4 +66,9 @@ public class BackupConfigFileProvider implements BackupConfigProvider {
 	public Path getBackupArchivePath() {
 		return java.nio.file.Paths.get(dataDir.getAbsolutePath(),pluginConfig.getString(BACKUP_ARCHIVE_DIR_KEY));
 	}
+
+	@Override
+	public Integer getMaxKeepedBackups() {
+		return pluginConfig.getInt(BACKUP_MAX_BEFORE_ERASE_KEY);
+	}
 }

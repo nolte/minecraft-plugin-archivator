@@ -13,8 +13,8 @@ public class ArchiveTempBaseFolderPreparation extends ArchiveBaseFolderPreparati
 	@NonNull
 	private final Path tempBaseDir;
 
-	public ArchiveTempBaseFolderPreparation(Path archiveBase, Path tempBaseDir) {
-		super(archiveBase);
+	public ArchiveTempBaseFolderPreparation(Path archiveBase, Path tempBaseDir, Integer maxKeepedBackups) {
+		super(archiveBase, maxKeepedBackups);
 		this.tempBaseDir = tempBaseDir;
 	}
 
