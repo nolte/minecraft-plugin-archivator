@@ -1,5 +1,8 @@
 # Archivator
 
+**Build Status** *(master branch)* **:**
+[![CircleCI](https://circleci.com/gh/nolte/minecraft-plugin-archivator.svg?style=svg)](https://circleci.com/gh/nolte/minecraft-plugin-archivator) [![Build Status](https://travis-ci.org/nolte/minecraft-plugin-archivator.svg?branch=master)](https://travis-ci.org/nolte/minecraft-plugin-archivator)
+
 ## Commands
 
 | Command               | Example                 |                     Description |
