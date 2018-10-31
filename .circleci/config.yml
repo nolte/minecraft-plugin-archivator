@@ -40,3 +40,7 @@ jobs:
       # run tests!
       - run: mvn integration-test
 
+      - store_artifacts:
+          path: "{{ working_directory }}/target/minecraft-backup-archiver-*-shaded.jar"
+          destination: minecraft-backup-archiver.jar
+
