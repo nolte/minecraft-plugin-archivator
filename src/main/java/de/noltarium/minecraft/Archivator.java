@@ -1,10 +1,13 @@
 package de.noltarium.minecraft;
 
 import static de.noltarium.minecraft.config.ArchivatorConfigurationFacade.NEWLINE;
+import static de.noltarium.minecraft.config.ArchivatorConfigurationFacade.humanReadableDateFormat;
 
+import java.sql.Date;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Optional;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -41,13 +44,12 @@ public final class Archivator extends JavaPlugin {
 		try {
 			configFacade = new ArchivatorConfigurationFacade(this);
 			chatFacade = new ChatFacade(this);
-			backupService = new BackupService(configFacade.getBackupConfigProvider(), chatFacade);
-			
+
 			DatabaseHandler handler = configFacade.getDatabaseHandler();
 			new DatabaseMigratorService(handler).migrateDatabase();
 			databaseFacade = new DatabaseFacade(handler, getLogger());
 
-//			autoBackupTasks = new AutoBackupSchedulingTask(backupService).runTaskTimer(this, 5000, 24 * 60 * 60 * 20);
+			backupService = new BackupService(configFacade.getBackupConfigProvider(), chatFacade, databaseFacade);
 
 		} catch (InvalidConfigurationException e) {
 			e.printStackTrace();
@@ -80,6 +82,21 @@ public final class Archivator extends JavaPlugin {
 					chatFacade.sendMessage((Player) sender,
 							ChatColor.RED + "Faild," + ChatColor.BLACK + " Backup allways running");
 				return false;
+			}
+			break;
+		case "backupinfo":
+			if (sender instanceof Player) {
+				Optional<OffsetDateTime> lastSuccessfull = databaseFacade.loadLastSuccessfullRun();
+				String format = "";
+				StringBuffer backupResult = new StringBuffer();
+				if (lastSuccessfull.isPresent()) {
+					OffsetDateTime offsetDateTime = lastSuccessfull.get();
+					format = humanReadableDateFormat.format(Date.from(offsetDateTime.toInstant()));
+				} else {
+					format = ChatColor.RED + "NEVER !!";
+				}
+				backupResult.append("Last Successfull Backup: ").append(format).append(NEWLINE);
+				chatFacade.sendMessage((Player) sender, backupResult.toString());
 			}
 			break;
 		case "backuplist":

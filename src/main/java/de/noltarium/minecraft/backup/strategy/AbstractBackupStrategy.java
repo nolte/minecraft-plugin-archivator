@@ -51,22 +51,20 @@ public abstract class AbstractBackupStrategy<T extends ArchiveBaseFolderPreparat
 		List<File> filesForArchive = execute();
 		try {
 			archiving.archiveFiles(filesForArchive, archiveId);
-
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 
 		finalyProcessStep();
-		
-		
+
 		try {
 			folderPreparation.cleanupOldArchives();
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		
+
 		OffsetDateTime endTime = OffsetDateTime.now(ZoneOffset.UTC);
 
 		// Create the Report

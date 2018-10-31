@@ -26,7 +26,8 @@ public abstract class AbstractStatementInteractionProcess<T> extends AbstractDat
 		try {
 			statement = connection.prepareStatement(query);
 			configurePreparedStatement(statement);
-			return workWithPreparedStatement(statement);
+			T workWithPreparedStatement = workWithPreparedStatement(statement);
+			return workWithPreparedStatement;
 
 		} catch (SQLException e) {
 			e.printStackTrace();

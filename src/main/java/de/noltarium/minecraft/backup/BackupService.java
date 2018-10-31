@@ -10,20 +10,22 @@ import org.bukkit.Bukkit;
 import de.noltarium.minecraft.Archivator;
 import de.noltarium.minecraft.backup.model.BackupAlwaysRunningException;
 import de.noltarium.minecraft.chat.ChatFacade;
+import de.noltarium.minecraft.database.DatabaseFacade;
 
 public class BackupService {
 
 	private final BackupConfigProvider config;
 	private static Thread thread = null;
 	private final ChatFacade chat;
+	private final DatabaseFacade databaseFacade;
 
-	public BackupService(BackupConfigProvider config, ChatFacade chat) {
+	public BackupService(BackupConfigProvider config, ChatFacade chat, DatabaseFacade databaseFacade) {
 		this.config = config;
 		this.chat = chat;
+		this.databaseFacade = databaseFacade;
 	}
 
 	public void shutdown() {
-		// TODO Auto-generated method stub
 	}
 
 	public void startFullBackup() throws BackupAlwaysRunningException {
@@ -43,8 +45,7 @@ public class BackupService {
 		if (thread != null && thread.isAlive()) {
 			throw new BackupAlwaysRunningException();
 		} else {
-
-			thread = new Thread(new BackupRunnable(backupSources, chat, config));
+			thread = new Thread(new BackupRunnable(backupSources, chat, config, databaseFacade));
 			thread.start();
 		}
 

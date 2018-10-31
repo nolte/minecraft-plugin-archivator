@@ -3,9 +3,11 @@ package de.noltarium.minecraft.database;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.Optional;
 import java.util.logging.Logger;
 
@@ -25,6 +27,13 @@ public class DatabaseFacade {
 
 	private final String tablePrefix;
 
+	public DatabaseFacade(DataSource datasource, String tablePrefix, Logger logger) {
+		super();
+		this.datasource = datasource;
+		this.tablePrefix = tablePrefix;
+		this.logger = logger;
+	}
+
 	public DatabaseFacade(DatabaseHandler databaseHandler, Logger logger) {
 		super();
 		this.datasource = databaseHandler.getDataSource();
@@ -32,7 +41,7 @@ public class DatabaseFacade {
 		this.logger = logger;
 	}
 
-	public void updateLastSuccessFullRun(OffsetDateTime date) {
+	public synchronized void updateLastSuccessFullRun(OffsetDateTime date) {
 
 		Optional<OffsetDateTime> last_update = loadLastSuccessfullRun();
 
@@ -48,36 +57,41 @@ public class DatabaseFacade {
 
 	}
 
-	private boolean updateLastSuccessfullUpdate(OffsetDateTime date) {
+	private Integer updateLastSuccessfullUpdate(OffsetDateTime date) {
 		return (new AbstractExecuteStatementInteractionProcess(
-				"UPDATE " + tablePrefix + "CONFIGURATION SET VALUE = ? WHERE ID = ?", datasource, logger) {
+				"UPDATE " + tablePrefix + "CONFIGURATION SET VALUE = ? WHERE ID = ?;", datasource, logger) {
 
 			@Override
 			protected void configurePreparedStatement(PreparedStatement statement) throws SQLException {
-				statement.setString(1, BACKUP_LAST_SUCCESSFUL_RUN_KEY);
-				statement.setString(2, Long.toString(date.toEpochSecond()));
+				statement.setString(2, BACKUP_LAST_SUCCESSFUL_RUN_KEY);
+				Timestamp test = Timestamp.valueOf(date.atZoneSameInstant(ZoneOffset.UTC).toLocalDateTime());
+				String string = Long.toString(test.getTime());
+				statement.setString(1, string);
+
 			}
 		}).executeConnectionTask();
 
 	}
 
-	private boolean insertLastSuccessfullUpdate(OffsetDateTime newTime) {
+	private Integer insertLastSuccessfullUpdate(OffsetDateTime newTime) {
 		return (new AbstractExecuteStatementInteractionProcess(
-				"INSERT INTO " + tablePrefix + "CONFIGURATION (ID,VALUE) VALUES( ?,?)", datasource, logger) {
+				"INSERT INTO " + tablePrefix + "CONFIGURATION (ID,VALUE) VALUES( ?,?);", datasource, logger) {
 
 			@Override
 			protected void configurePreparedStatement(PreparedStatement statement) throws SQLException {
 				statement.setString(1, BACKUP_LAST_SUCCESSFUL_RUN_KEY);
-				statement.setString(2, Long.toString(newTime.toEpochSecond()));
+				Timestamp test = Timestamp.valueOf(newTime.atZoneSameInstant(ZoneOffset.UTC).toLocalDateTime());
+				String string = Long.toString(test.getTime());
+				statement.setString(2, string);
 			}
 		}).executeConnectionTask();
 
 	}
 
-	public Optional<OffsetDateTime> loadLastSuccessfullRun() {
+	public synchronized Optional<OffsetDateTime> loadLastSuccessfullRun() {
 
 		return (new AbstractReadStatementInteractionProcess<Optional<OffsetDateTime>>(
-				"SELECT * FROM " + tablePrefix + "CONFIGURATION where id = ?", datasource, logger) {
+				"SELECT * FROM " + tablePrefix + "CONFIGURATION where id = ?;", datasource, logger) {
 			@Override
 			protected Optional<OffsetDateTime> workWithResultSet(ResultSet rs) throws SQLException {
 				if (!rs.next()) {

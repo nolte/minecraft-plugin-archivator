@@ -7,7 +7,7 @@
 
 | Command               | Example                 |                     Description |
 |-----------------------|-------------------------|---------------------------------|
-| ```/backup [world]``` | ```/backup world```     | Manual start the Backup Process |
+| ```/backup``` | ```/backup```     | Manual start the Backup Process |
 | ```/backuplist```     | ```/backuplist```       | List all existing backups       |
 
 
@@ -21,19 +21,20 @@ By default the ```Archivator``` using the Pluginfolder for archive the Backuops.
 ```
 archivator:
   archive:
-    dir: Archivator/archive
-    name: "mc-{0,DATE,YYYMMDDHHmmSSsss}"
+    dir: archive
+    name: mc-{0,DATE,YYYMMDDHHmmSSsss}
     format: zip
-  workingtmp: Archivator/workdir
+  workingtmp: workdir
   strategy: safty
+  maxBackupsBeforeErase: 5
   report:
     enabled: true
   sources:
-    worlds: *
+    worlds: '*'
   database:
     type: sqlite
     file: archivator.db
-    table_prefix: "arc_"
+    table_prefix: arc_
 
 ```
 

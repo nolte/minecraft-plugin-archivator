@@ -15,18 +15,22 @@ import de.noltarium.minecraft.backup.strategy.AbstractBackupStrategy;
 import de.noltarium.minecraft.backup.strategy.DirectBackupStrategy;
 import de.noltarium.minecraft.backup.strategy.SaftyBackupStrategy;
 import de.noltarium.minecraft.chat.ChatNotification;
+import de.noltarium.minecraft.database.DatabaseFacade;
 
 public class BackupRunnable implements Runnable {
 
 	private final ChatNotification chat;
 	private final BackupConfigProvider config;
 	private final List<File> backupSources;
+	private final DatabaseFacade databaseFacade;
 
-	public BackupRunnable(List<File> backupSources, ChatNotification chat, BackupConfigProvider config) {
+	public BackupRunnable(List<File> backupSources, ChatNotification chat, BackupConfigProvider config,
+			DatabaseFacade databaseFacade) {
 		super();
 		this.backupSources = backupSources;
 		this.chat = chat;
 		this.config = config;
+		this.databaseFacade = databaseFacade;
 	}
 
 	@Override
@@ -58,8 +62,9 @@ public class BackupRunnable implements Runnable {
 			chat.msgAdmins("Backup \"" + archiveId + "\" faild ...");
 			throw new IllegalArgumentException("not supported Strategy Type" + type);
 		}
-		backupStrategy.executeProcess();
 
+		backupStrategy.executeProcess();
+		databaseFacade.updateLastSuccessFullRun(startTime);
 		chat.msgAdmins("Backup \"" + archiveId + "\" finished ...");
 	}
 
