@@ -1,16 +1,20 @@
 package de.noltarium.minecraft.backup;
 
 import java.io.File;
+import java.sql.Date;
+import java.text.MessageFormat;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 
-import de.noltarium.minecraft.Archivator;
 import de.noltarium.minecraft.backup.model.BackupAlwaysRunningException;
 import de.noltarium.minecraft.chat.ChatFacade;
 import de.noltarium.minecraft.database.DatabaseFacade;
+import de.noltarium.minecraft.database.model.BackupEntity;
 
 public class BackupService {
 
@@ -45,7 +49,13 @@ public class BackupService {
 		if (thread != null && thread.isAlive()) {
 			throw new BackupAlwaysRunningException();
 		} else {
-			thread = new Thread(new BackupRunnable(backupSources, chat, config, databaseFacade));
+			OffsetDateTime startTime = OffsetDateTime.now(ZoneOffset.UTC);
+			String archiveId = MessageFormat.format(config.getArchiveNameFormat(), Date.from(startTime.toInstant()));
+			BackupEntity run = BackupEntity.builder().planedBackupFiles(backupSources).backupRunId(archiveId)
+					.startTime(startTime).build();
+			databaseFacade.insertNewBackupRun(run);
+			
+			thread = new Thread(new BackupRunnable(run, chat, config, databaseFacade));
 			thread.start();
 		}
 

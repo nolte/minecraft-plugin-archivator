@@ -1,5 +1,6 @@
 package de.noltarium.minecraft.database;
 
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -16,6 +17,7 @@ import javax.sql.DataSource;
 import de.noltarium.minecraft.config.DatabaseHandler;
 import de.noltarium.minecraft.database.access.AbstractExecuteStatementInteractionProcess;
 import de.noltarium.minecraft.database.access.AbstractReadStatementInteractionProcess;
+import de.noltarium.minecraft.database.model.BackupEntity;
 
 public class DatabaseFacade {
 	public static final String BACKUP_LAST_SUCCESSFUL_RUN_KEY = "lastSuccessfullRun";
@@ -112,4 +114,60 @@ public class DatabaseFacade {
 		}).executeConnectionTask();
 	}
 
+	public Integer insertNewBackupRun(BackupEntity run) {
+		return (new AbstractExecuteStatementInteractionProcess(
+				"INSERT INTO " + tablePrefix
+						+ "BACKUPS (ID,startedAt,finishedAt,Initiator,createdAt) VALUES( ?,?,?,?,?);",
+				datasource, logger) {
+
+			@Override
+			protected void configurePreparedStatement(PreparedStatement statement) throws SQLException {
+				statement.setString(1, run.getBackupRunId());
+				appendOffsetTime(statement, run.getStartTime(), 2);
+				appendOffsetTime(statement, run.getEndTime(), 3);
+				statement.setString(4, run.getTrigger());
+				appendOffsetTime(statement, OffsetDateTime.now(), 5);
+			}
+
+			private void appendOffsetTime(PreparedStatement statement, OffsetDateTime startTime, int parameterIndex)
+					throws SQLException {
+				if (startTime != null) {
+					Timestamp test = Timestamp.valueOf(startTime.atZoneSameInstant(ZoneOffset.UTC).toLocalDateTime());
+					statement.setDate(parameterIndex, new Date(test.getTime()));
+				} else {
+					statement.setDate(parameterIndex, null);
+				}
+			}
+		}).executeConnectionTask();
+
+	}
+
+	public Integer updateBackupRun(BackupEntity run) {
+		return (new AbstractExecuteStatementInteractionProcess(
+				"UPDATE " + tablePrefix
+						+ "BACKUPS SET startedAt=?, finishedAt=?, initiator=?, backupFile=? WHERE ID = ?;",
+				datasource, logger) {
+
+			@Override
+			protected void configurePreparedStatement(PreparedStatement statement) throws SQLException {
+
+				appendOffsetTime(statement, run.getStartTime(), 1);
+				appendOffsetTime(statement, run.getEndTime(), 2);
+				statement.setString(3, run.getTrigger());
+				statement.setString(4, run.getBackupFile());
+				statement.setString(5, run.getBackupRunId());
+			}
+
+			private void appendOffsetTime(PreparedStatement statement, OffsetDateTime startTime, int parameterIndex)
+					throws SQLException {
+				if (startTime != null) {
+					Timestamp test = Timestamp.valueOf(startTime.atZoneSameInstant(ZoneOffset.UTC).toLocalDateTime());
+					statement.setDate(parameterIndex, new Date(test.getTime()));
+				} else {
+					statement.setDate(parameterIndex, null);
+				}
+			}
+		}).executeConnectionTask();
+
+	}
 }

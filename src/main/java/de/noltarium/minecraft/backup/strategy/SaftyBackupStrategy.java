@@ -16,6 +16,7 @@ import de.noltarium.minecraft.backup.model.BackupCopyModel;
 import de.noltarium.minecraft.backup.model.BackupCopyModel.BackupCopyModelBuilder;
 import de.noltarium.minecraft.backup.steps.ArchiveTempBaseFolderPreparation;
 import de.noltarium.minecraft.backup.steps.ArchivingStep;
+import de.noltarium.minecraft.database.model.BackupEntity;
 import net.steppschuh.markdowngenerator.table.Table;
 import net.steppschuh.markdowngenerator.text.heading.Heading;
 
@@ -24,18 +25,18 @@ public class SaftyBackupStrategy extends AbstractBackupStrategy<ArchiveTempBaseF
 	private List<BackupCopyModel> preparedElements;
 	private File backupWorkingRunDir;
 
-	public SaftyBackupStrategy(String archiveId, List<File> backupSources, ArchivingStep archiving,
+	public SaftyBackupStrategy(BackupEntity backup, ArchivingStep archiving,
 			ArchiveTempBaseFolderPreparation folderPreparation) {
-		super(archiveId, backupSources, archiving, folderPreparation);
+		super(backup, archiving, folderPreparation);
 	}
 
 	@Override
 	protected List<File> execute() {
 		String backupWorkingBasdir = getFolderPreparation().getTempBaseDir().toFile().getAbsolutePath();
 
-		backupWorkingRunDir = Paths.get(backupWorkingBasdir, getArchiveId()).toFile();
+		backupWorkingRunDir = Paths.get(backupWorkingBasdir, getBackup().getBackupRunId()).toFile();
 		backupWorkingRunDir.mkdirs();
-		preparedElements = getBackupSources().parallelStream().map(original -> {
+		preparedElements = getBackup().getPlanedBackupFiles().parallelStream().map(original -> {
 			File targetFile = Paths.get(backupWorkingRunDir.getAbsolutePath(), original.getName()).toFile();
 			BackupCopyModelBuilder builder = BackupCopyModel.builder();
 			builder.original(original).target(targetFile);

@@ -27,7 +27,7 @@ public class ArchivingStep {
 		this.archive_type = archive_type;
 	}
 
-	public void archiveFiles(List<File> files, String archiveId) throws IOException {
+	public File archiveFiles(List<File> files, String archiveId) throws IOException {
 
 		String destZipFile = archiveBase.getArchiveBase().toString() + "/" + archiveId + "."
 				+ archive_type.getExtention();
@@ -38,6 +38,7 @@ public class ArchivingStep {
 		FileCompress compressor = new FileCompress();
 		File archivedBackup = new File(destZipFile);
 		archive = compressor.compressFiles(files, archivedBackup, archive_type);
+		return archive;
 
 	}
 

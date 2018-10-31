@@ -6,18 +6,19 @@ import java.util.List;
 
 import de.noltarium.minecraft.backup.steps.ArchiveBaseFolderPreparation;
 import de.noltarium.minecraft.backup.steps.ArchivingStep;
+import de.noltarium.minecraft.database.model.BackupEntity;
 
 public class DirectBackupStrategy extends AbstractBackupStrategy<ArchiveBaseFolderPreparation> {
 
-	public DirectBackupStrategy(String archiveId, List<File> backupSources, ArchivingStep archiving,
+	public DirectBackupStrategy(BackupEntity backup, ArchivingStep archiving,
 			ArchiveBaseFolderPreparation folderPreparation) {
-		super(archiveId, backupSources, archiving, folderPreparation);
+		super(backup, archiving, folderPreparation);
 	}
 
 	@Override
 	public List<File> execute() {
 		// do nothink return the original
-		return getBackupSources();
+		return getBackup().getPlanedBackupFiles();
 	}
 
 	@Override

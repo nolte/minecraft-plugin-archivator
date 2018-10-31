@@ -7,7 +7,8 @@ create table ${achivator_db_table_prefix}BACKUPS (
     ID  varchar(255) NOT NULL,
     startedAt datetime,
     finishedAt datetime,
-    Initiator varchar(255),
+    initiator varchar(255),
+    backupFile varchar(255),
     createdAt datetime NOT NULL,
     PRIMARY KEY (ID)
 );

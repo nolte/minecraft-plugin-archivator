@@ -16,6 +16,7 @@ import org.apache.commons.io.FileUtils;
 import de.noltarium.minecraft.Archivator;
 import de.noltarium.minecraft.backup.steps.ArchiveBaseFolderPreparation;
 import de.noltarium.minecraft.backup.steps.ArchivingStep;
+import de.noltarium.minecraft.database.model.BackupEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import net.steppschuh.markdowngenerator.list.UnorderedList;
@@ -28,29 +29,26 @@ import net.steppschuh.markdowngenerator.text.heading.Heading;
 @Data
 public abstract class AbstractBackupStrategy<T extends ArchiveBaseFolderPreparation> {
 
-	private final List<File> backupSources;
 	private final T folderPreparation;
 	private final ArchivingStep archiving;
-	private final String archiveId;
+	private final BackupEntity backup;
 
-	public AbstractBackupStrategy(String archiveId, List<File> backupSources, ArchivingStep archiving,
-			T folderPreparation) {
+	public AbstractBackupStrategy(BackupEntity backup, ArchivingStep archiving, T folderPreparation) {
 		super();
-		this.archiveId = archiveId;
-		this.backupSources = backupSources;
+		this.backup = backup;
 		this.folderPreparation = folderPreparation;
 		this.archiving = archiving;
 	}
 
 	public void executeProcess() {
-		OffsetDateTime startTime = OffsetDateTime.now(ZoneOffset.UTC);
-
+		backup.setStartTime(OffsetDateTime.now(ZoneOffset.UTC));
 		// prepare the backup filesystem structrue
 		folderPreparation.execute();
 
 		List<File> filesForArchive = execute();
+		File archive = null;
 		try {
-			archiving.archiveFiles(filesForArchive, archiveId);
+			archive = archiving.archiveFiles(filesForArchive, backup.getBackupRunId());
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -65,17 +63,17 @@ public abstract class AbstractBackupStrategy<T extends ArchiveBaseFolderPreparat
 			e1.printStackTrace();
 		}
 
-		OffsetDateTime endTime = OffsetDateTime.now(ZoneOffset.UTC);
-
+		backup.setEndTime(OffsetDateTime.now(ZoneOffset.UTC));
+		backup.setBackupFile(archive.getName());
 		// Create the Report
 		StringBuffer report = new StringBuffer();
-		writeReportHeadline(startTime, endTime, report);
+		writeReportHeadline(backup.getStartTime(), backup.getEndTime(), report);
 
 		report.append(createProcessReport().toString());
 		report.append(archiving.createReport().toString());
 
-		File reportFile = java.nio.file.Paths
-				.get(folderPreparation.getArchiveBase().toFile().getAbsolutePath(), archiveId + "-report.md").toFile();
+		File reportFile = java.nio.file.Paths.get(folderPreparation.getArchiveBase().toFile().getAbsolutePath(),
+				backup.getBackupRunId() + "-report.md").toFile();
 		try {
 			FileUtils.writeStringToFile(reportFile, report.toString(), Charset.forName("UTF-8"));
 		} catch (IOException e) {
@@ -103,7 +101,7 @@ public abstract class AbstractBackupStrategy<T extends ArchiveBaseFolderPreparat
 				.append(new ItalicText(humanReadableDateFormat.format(Date.from(endTime.toInstant())))).append(NEWLINE);
 
 		report.append(new BoldText("Files under Backup:")).append(NEWLINE);
-		report.append(new UnorderedList<>(backupSources)).append(NEWLINE).append(NEWLINE);
+		report.append(new UnorderedList<>(backup.getPlanedBackupFiles())).append(NEWLINE).append(NEWLINE);
 
 	}
 

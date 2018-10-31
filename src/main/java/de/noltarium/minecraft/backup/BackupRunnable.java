@@ -1,10 +1,6 @@
 package de.noltarium.minecraft.backup;
 
 import java.io.File;
-import java.sql.Date;
-import java.text.MessageFormat;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.util.List;
 
 import de.noltarium.minecraft.backup.model.BackupProcessStrategyType;
@@ -16,18 +12,19 @@ import de.noltarium.minecraft.backup.strategy.DirectBackupStrategy;
 import de.noltarium.minecraft.backup.strategy.SaftyBackupStrategy;
 import de.noltarium.minecraft.chat.ChatNotification;
 import de.noltarium.minecraft.database.DatabaseFacade;
+import de.noltarium.minecraft.database.model.BackupEntity;
 
 public class BackupRunnable implements Runnable {
 
 	private final ChatNotification chat;
 	private final BackupConfigProvider config;
-	private final List<File> backupSources;
+	private final BackupEntity backupEntity;
 	private final DatabaseFacade databaseFacade;
 
-	public BackupRunnable(List<File> backupSources, ChatNotification chat, BackupConfigProvider config,
+	public BackupRunnable(BackupEntity backupEntity, ChatNotification chat, BackupConfigProvider config,
 			DatabaseFacade databaseFacade) {
 		super();
-		this.backupSources = backupSources;
+		this.backupEntity = backupEntity;
 		this.chat = chat;
 		this.config = config;
 		this.databaseFacade = databaseFacade;
@@ -36,10 +33,6 @@ public class BackupRunnable implements Runnable {
 	@Override
 	public void run() {
 		chat.msgAdmins("Starting Backup");
-
-		OffsetDateTime startTime = OffsetDateTime.now(ZoneOffset.UTC);
-
-		String archiveId = MessageFormat.format(config.getArchiveNameFormat(), Date.from(startTime.toInstant()));
 
 		BackupProcessStrategyType type = config.getBackupStrategy();
 
@@ -50,22 +43,23 @@ public class BackupRunnable implements Runnable {
 					config.getMaxKeepedBackups());
 			ArchivingStep archiving = new ArchivingStep(folderPrep, config.getArchiveType());
 
-			backupStrategy = new DirectBackupStrategy(archiveId, backupSources, archiving, folderPrep);
+			backupStrategy = new DirectBackupStrategy(backupEntity, archiving, folderPrep);
 			break;
 		case SAFTY:
 			ArchiveTempBaseFolderPreparation folderTmpPrep = new ArchiveTempBaseFolderPreparation(
 					config.getBackupArchivePath(), config.getBackupWorkingPath(), config.getMaxKeepedBackups());
 			ArchivingStep archivingWithTmp = new ArchivingStep(folderTmpPrep, config.getArchiveType());
-			backupStrategy = new SaftyBackupStrategy(archiveId, backupSources, archivingWithTmp, folderTmpPrep);
+			backupStrategy = new SaftyBackupStrategy(backupEntity, archivingWithTmp, folderTmpPrep);
 			break;
 		default:
-			chat.msgAdmins("Backup \"" + archiveId + "\" faild ...");
+			chat.msgAdmins("Backup \"" + backupEntity.getBackupRunId() + "\" faild ...");
 			throw new IllegalArgumentException("not supported Strategy Type" + type);
 		}
 
 		backupStrategy.executeProcess();
-		databaseFacade.updateLastSuccessFullRun(startTime);
-		chat.msgAdmins("Backup \"" + archiveId + "\" finished ...");
+		databaseFacade.updateBackupRun(backupEntity);
+		databaseFacade.updateLastSuccessFullRun(backupEntity.getStartTime());
+		chat.msgAdmins("Backup \"" + backupEntity.getBackupRunId() + "\" finished ...");
 	}
 
 }
