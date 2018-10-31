@@ -5,10 +5,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.sql.Types;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
 
@@ -135,7 +138,7 @@ public class DatabaseFacade {
 					Timestamp test = Timestamp.valueOf(startTime.atZoneSameInstant(ZoneOffset.UTC).toLocalDateTime());
 					statement.setDate(parameterIndex, new Date(test.getTime()));
 				} else {
-					statement.setDate(parameterIndex, null);
+					statement.setNull(parameterIndex, Types.DATE);
 				}
 			}
 		}).executeConnectionTask();
@@ -169,5 +172,33 @@ public class DatabaseFacade {
 			}
 		}).executeConnectionTask();
 
+	}
+
+	public synchronized List<BackupEntity> loadBackupRuns() {
+
+		return (new AbstractReadStatementInteractionProcess<List<BackupEntity>>(
+				"SELECT * FROM " + tablePrefix + "BACKUPS;", datasource, logger) {
+			@Override
+			protected List<BackupEntity> workWithResultSet(ResultSet rs) throws SQLException {
+				List<BackupEntity> backups = new ArrayList<>();
+				while (rs.next()) {
+					backups.add(BackupEntity.builder().backupRunId(rs.getString("ID"))
+							.startTime(toOffsetDate(rs.getDate("startedAt")))
+							.endTime(toOffsetDate(rs.getDate("finishedAt"))).backupFile(rs.getString("backupFile"))
+							.createdAt(toOffsetDate(rs.getDate("createdAt"))).trigger(rs.getString("initiator"))
+							.build());
+				}
+				return backups;
+			}
+
+			@Override
+			protected void configurePreparedStatement(PreparedStatement statement) throws SQLException {
+			}
+		}).executeConnectionTask();
+
+	}
+
+	private OffsetDateTime toOffsetDate(Date date) {
+		return OffsetDateTime.ofInstant(Instant.ofEpochMilli(date.getTime()), ZoneId.of("UTC"));
 	}
 }

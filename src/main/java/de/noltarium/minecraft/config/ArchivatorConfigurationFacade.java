@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -19,8 +21,7 @@ import de.noltarium.minecraft.database.SupportedDatabaseType;
 
 public class ArchivatorConfigurationFacade {
 
-	public static final SimpleDateFormat humanReadableDateFormat = new SimpleDateFormat("YYY-MM-DD HH:mm:SS");
-	public static final SimpleDateFormat archiveFormat = new SimpleDateFormat("YYYMMDDHHmmSSsss");
+	public static final DateTimeFormatter humanReadableDateFormat = DateTimeFormatter.ofPattern("YYY-MM-dd HH:mm:ss Z");
 	public static final String NEWLINE = System.lineSeparator();
 
 	protected static final String BACKUP_PROPERTY_PREFIX = "archivator.";

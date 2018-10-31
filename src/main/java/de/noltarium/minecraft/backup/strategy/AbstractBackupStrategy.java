@@ -91,14 +91,12 @@ public abstract class AbstractBackupStrategy<T extends ArchiveBaseFolderPreparat
 
 	private void writeReportHeadline(OffsetDateTime startTime, OffsetDateTime endTime, StringBuffer report) {
 
-		report.append(
-				new Heading("Backup from: " + humanReadableDateFormat.format(Date.from(startTime.toInstant())), 1))
-				.append(NEWLINE).append(NEWLINE);
+		report.append(new Heading("Backup from: " + startTime.format(humanReadableDateFormat), 1)).append(NEWLINE)
+				.append(NEWLINE);
 
 		report.append(new BoldText("From:")).append(" ")
-				.append(new ItalicText(humanReadableDateFormat.format(Date.from(startTime.toInstant()))))
-				.append(new Text(" - "))
-				.append(new ItalicText(humanReadableDateFormat.format(Date.from(endTime.toInstant())))).append(NEWLINE);
+				.append(new ItalicText(startTime.format(humanReadableDateFormat))).append(new Text(" - "))
+				.append(new ItalicText(endTime.format(humanReadableDateFormat))).append(NEWLINE);
 
 		report.append(new BoldText("Files under Backup:")).append(NEWLINE);
 		report.append(new UnorderedList<>(backup.getPlanedBackupFiles())).append(NEWLINE).append(NEWLINE);

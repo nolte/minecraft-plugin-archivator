@@ -17,6 +17,7 @@ public class BackupEntity {
 	private OffsetDateTime startTime;
 
 	private OffsetDateTime endTime;
+	private OffsetDateTime createdAt;
 
 	private String trigger;
 

@@ -3,7 +3,6 @@ package de.noltarium.minecraft;
 import static de.noltarium.minecraft.config.ArchivatorConfigurationFacade.NEWLINE;
 import static de.noltarium.minecraft.config.ArchivatorConfigurationFacade.humanReadableDateFormat;
 
-import java.sql.Date;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
@@ -25,6 +24,7 @@ import de.noltarium.minecraft.config.ArchivatorConfigurationFacade;
 import de.noltarium.minecraft.config.DatabaseHandler;
 import de.noltarium.minecraft.database.DatabaseFacade;
 import de.noltarium.minecraft.database.DatabaseMigratorService;
+import de.noltarium.minecraft.database.model.BackupEntity;
 
 public final class Archivator extends JavaPlugin {
 
@@ -91,7 +91,7 @@ public final class Archivator extends JavaPlugin {
 				StringBuffer backupResult = new StringBuffer();
 				if (lastSuccessfull.isPresent()) {
 					OffsetDateTime offsetDateTime = lastSuccessfull.get();
-					format = humanReadableDateFormat.format(Date.from(offsetDateTime.toInstant()));
+					format = offsetDateTime.format(humanReadableDateFormat);
 				} else {
 					format = ChatColor.RED + "NEVER !!";
 				}
@@ -109,6 +109,19 @@ public final class Archivator extends JavaPlugin {
 
 				for (String string : backups) {
 					backupResult.append(ChatColor.GOLD + " *  " + ChatColor.WHITE + string).append(NEWLINE);
+				}
+
+				chatFacade.sendMessage((Player) sender, backupResult.toString());
+
+				List<BackupEntity> backupsFromDB = databaseFacade.loadBackupRuns();
+				backupResult = new StringBuffer();
+				backupResult.append("Existing Backups: ").append(NEWLINE);
+
+				for (BackupEntity string : backupsFromDB) {
+					backupResult.append(ChatColor.GOLD + " *  " + ChatColor.WHITE + string.getBackupFile()
+							+ ChatColor.GRAY + "(" + ArchivatorConfigurationFacade.humanReadableDateFormat
+									.format(string.getStartTime().toLocalTime()))
+							.append(NEWLINE);
 				}
 
 				chatFacade.sendMessage((Player) sender, backupResult.toString());
