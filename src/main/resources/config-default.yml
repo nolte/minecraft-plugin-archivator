@@ -1,0 +1,15 @@
+archivator:
+  archive:
+    dir: archive
+    name: "mc-{0,DATE,YYYMMDDHHmmSSsss}"
+    format: zip
+  workingtmp: workdir
+  strategy: safty
+  report:
+    enabled: true
+  sources:
+    worlds: "*"
+  database:
+    type: sqlite
+    file: archivator.db
+    table_prefix: "arc_"

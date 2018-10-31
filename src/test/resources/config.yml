@@ -1,0 +1,65 @@
+backup:
+  archive: /tmp/archive
+  workdir: /tmp/workdir
+
+sources:
+  jarfile: false # The .jar file of your server (e.g. craftbukkit.jar)
+  properties: true # The server.properties file
+  ops: true # The ops.json file
+  whitelist: false # The whitelist.json file
+  spigotyml: true # If on spigot, the spigot.yml file
+  bukkityml: true # The bukkit.yml file
+  aliases: false # The commands.yml file
+  eula: false # The eula.txt file
+  metrics: false # The PluginMetrics folder
+  logs: false # The logs folder, with all the zips (WARNING! This can make your
+  pluginjars: true # The .jar files for the plugins
+  pluginconfs: true # The data folder of each plugin
+  worlds: # Use [] for no world, and - '*' for all the worlds.
+    - 'world'
+    - 'world_nether'
+    - 'world_the_end'
+  other: # Any other file you want to backup, using "!" before will prevent it from backupping (IMPORTANT! Use / for directories!)
+    - 'plugins/PluginMetrics'
+    - '!plugins/Essentials'
+    - '!plugins/WorldEdit'
+    - '!plugins/PerfectBackup/backups'
+
+strategy: SAFTY
+archive: zip # zip/tar or false
+report: true
+database:
+  type: sqllight
+  file: archivator.db
+
+crontask: '0 0 4 * * *' # This would make it every day at 4 AM
+
+# CronTask format:
+# * * * * * *
+# | | | | | |
+# | | | | | +–––– Day of the Week   (1-7)
+# | | | | +–––––– Month             (1-12)
+# | | | +–––––––– Day of the Month  (1-31)
+# | | +–––––––––– Hour              (0-23)
+# | +–––––––––––– Minute            (0-59)
+# +–––––––––––––– Second            (0-59)
+
+# A few more examples...
+# crontask: '0 0 * * * *' This would make it every hour
+# crontask: '0 0 4 * * 7' This would make it every sunday at 4 AM
+# crontask: '0 0 4 1 * *' This would make it every first of the month at 4 AM
+
+
+publishing:
+  - type: ftp
+    url:
+    target:
+  - type: googledrive
+    url:
+    target:
+  - type: onedrive
+    url:
+    target:
+  - type: dropbox
+    url:
+    target:
