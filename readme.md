@@ -47,11 +47,10 @@ archivator:
   - configure the archived filename
 - create a Markdown Backup Report, to the Archive Folder  
 - starting the backup over [RCON](https://wiki.vg/RCON)
-
+- maximum keeped archives
 
 ### Planed Feature Sets
 
-- maximum keeped archives
 - automatical backup job, controlled by Cron
 - markdown Backup report
   - Publishing the report to a Markdown Based Wiki like [Golum Wiki](https://github.com/gollum/gollum)
