@@ -5,6 +5,7 @@ import static de.noltarium.minecraft.config.ArchivatorConfigurationFacade.humanR
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,7 +44,7 @@ public final class Archivator extends JavaPlugin {
 		plugin = this;
 		try {
 			configFacade = new ArchivatorConfigurationFacade(this);
-			chatFacade = new ChatFacade(this);
+			chatFacade = new ChatFacade(this.getName());
 
 			DatabaseHandler handler = configFacade.getDatabaseHandler();
 			new DatabaseMigratorService(handler).migrateDatabase();
@@ -119,9 +120,11 @@ public final class Archivator extends JavaPlugin {
 
 				for (BackupEntity string : backupsFromDB) {
 					backupResult.append(ChatColor.GOLD + " *  " + ChatColor.WHITE + string.getBackupFile()
-							+ ChatColor.GRAY + "(" + ArchivatorConfigurationFacade.humanReadableDateFormat
-									.format(string.getStartTime().toLocalTime()))
-							.append(NEWLINE);
+							+ ChatColor.GRAY + "("
+							+ string.getStartTime().format(ArchivatorConfigurationFacade.humanReadableDateFormat)
+							+ " runs: " + string.getEndTime()
+									.minus(string.getStartTime().toEpochSecond(), ChronoUnit.SECONDS).toEpochSecond()
+							+ ")").append(NEWLINE);
 				}
 
 				chatFacade.sendMessage((Player) sender, backupResult.toString());

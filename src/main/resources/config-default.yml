@@ -6,6 +6,9 @@ archivator:
   workingtmp: workdir
   strategy: safty
   maxBackupsBeforeErase: 5
+  autobackup:
+    enabled: false
+    intervall: 
   report:
     enabled: true
   sources:

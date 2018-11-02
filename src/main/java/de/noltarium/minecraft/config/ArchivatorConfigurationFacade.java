@@ -6,9 +6,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
 
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -23,6 +23,7 @@ public class ArchivatorConfigurationFacade {
 
 	public static final DateTimeFormatter humanReadableDateFormat = DateTimeFormatter.ofPattern("YYY-MM-dd HH:mm:ss Z");
 	public static final String NEWLINE = System.lineSeparator();
+	public static final ZoneId defaultTimeZone = ZoneOffset.UTC;
 
 	protected static final String BACKUP_PROPERTY_PREFIX = "archivator.";
 
