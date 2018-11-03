@@ -1,5 +1,7 @@
 package de.noltarium.minecraft.database;
 
+import static de.noltarium.minecraft.config.ArchivatorConfigurationFacade.defaultTimeZone;
+
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -8,7 +10,6 @@ import java.sql.Timestamp;
 import java.sql.Types;
 import java.time.Instant;
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
@@ -69,8 +70,7 @@ public class DatabaseFacade {
 			@Override
 			protected void configurePreparedStatement(PreparedStatement statement) throws SQLException {
 				statement.setString(2, BACKUP_LAST_SUCCESSFUL_RUN_KEY);
-				Timestamp test = Timestamp.valueOf(date.atZoneSameInstant(ZoneOffset.UTC).toLocalDateTime());
-				String string = Long.toString(test.getTime());
+				String string = Long.toString(date.toEpochSecond());
 				statement.setString(1, string);
 
 			}
@@ -85,8 +85,7 @@ public class DatabaseFacade {
 			@Override
 			protected void configurePreparedStatement(PreparedStatement statement) throws SQLException {
 				statement.setString(1, BACKUP_LAST_SUCCESSFUL_RUN_KEY);
-				Timestamp test = Timestamp.valueOf(newTime.atZoneSameInstant(ZoneOffset.UTC).toLocalDateTime());
-				String string = Long.toString(test.getTime());
+				String string = Long.toString(newTime.toEpochSecond());
 				statement.setString(2, string);
 			}
 		}).executeConnectionTask();
@@ -105,7 +104,7 @@ public class DatabaseFacade {
 				} else {
 					String user = rs.getString("value");
 					return Optional
-							.of(OffsetDateTime.ofInstant(Instant.ofEpochMilli(Long.valueOf(user)), ZoneId.of("UTC")));
+							.of(OffsetDateTime.ofInstant(Instant.ofEpochSecond(Long.valueOf(user)), defaultTimeZone));
 				}
 			}
 
@@ -135,8 +134,7 @@ public class DatabaseFacade {
 			private void appendOffsetTime(PreparedStatement statement, OffsetDateTime startTime, int parameterIndex)
 					throws SQLException {
 				if (startTime != null) {
-					Timestamp test = Timestamp.valueOf(startTime.atZoneSameInstant(ZoneOffset.UTC).toLocalDateTime());
-					statement.setDate(parameterIndex, new Date(test.getTime()));
+					statement.setDate(parameterIndex, toSQLDate(startTime));
 				} else {
 					statement.setNull(parameterIndex, Types.DATE);
 				}
@@ -164,8 +162,7 @@ public class DatabaseFacade {
 			private void appendOffsetTime(PreparedStatement statement, OffsetDateTime startTime, int parameterIndex)
 					throws SQLException {
 				if (startTime != null) {
-					Timestamp test = Timestamp.valueOf(startTime.atZoneSameInstant(ZoneOffset.UTC).toLocalDateTime());
-					statement.setDate(parameterIndex, new Date(test.getTime()));
+					statement.setDate(parameterIndex, toSQLDate(startTime));
 				} else {
 					statement.setDate(parameterIndex, null);
 				}
@@ -199,6 +196,13 @@ public class DatabaseFacade {
 	}
 
 	private OffsetDateTime toOffsetDate(Date date) {
-		return OffsetDateTime.ofInstant(Instant.ofEpochMilli(date.getTime()), ZoneId.of("UTC"));
+		if (date == null)
+			return null;
+		else
+			return OffsetDateTime.ofInstant(Instant.ofEpochSecond(date.getTime()), defaultTimeZone);
+	}
+
+	private Date toSQLDate(OffsetDateTime date) {
+		return new Date(date.toEpochSecond());
 	}
 }
