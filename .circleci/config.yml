@@ -74,9 +74,9 @@ workflows:
       - build
 
       # test optional goal
-      - release_create
-        requires:
-          - build
-        filters:
-          tags:
-            only: v.*
+      - release_create:
+          requires:
+            - build
+          filters:
+            tags:
+              only: v.*
