@@ -13,13 +13,13 @@ jobs:
       - image: circleci/golang:1.8
     steps:
       - attach_workspace:
-          at: /tmp/buildArtefacts
+          at: /tmp/workspace
       - run:
           name: "Publish Release on GitHub"
           command: |
             go get github.com/tcnksm/ghr
             VERSION=v1.0.0-SNAPSHOT
-            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} /tmp/buildArtefacts/
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} /tmp/workspace/buildArtefacts/
 
 
   build:
@@ -56,10 +56,20 @@ jobs:
           name: Save test results
           command: |
             mkdir -p /tmp/buildArtefacts/
-            find . -type f -regex ".*/target/.*-shaded.jar" -exec cp {} /tmp/buildArtefacts/ \;
+            find . -type f -regex ".*/target/.*-shaded.jar" -exec cp {} /tmp/workspace/buildArtefacts/ \;
           when: always
-      - store_artifacts:
-          path: /tmp/buildArtefacts
+
+  #    - store_artifacts:
+  #        path: /tmp/buildArtefacts
+
+      # Persist the specified paths (workspace/echo-output) into the workspace for use in downstream job.
+      - persist_to_workspace:
+          # Must be an absolute path, or relative path from working_directory. This is a directory on the container which is
+    	    # taken to be the root directory of the workspace.
+          root: workspace
+          # Must be relative path from root
+          paths:
+              - buildArtefacts
 
 
       - run:
