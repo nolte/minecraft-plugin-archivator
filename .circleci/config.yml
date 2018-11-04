@@ -3,19 +3,23 @@
 # Check https://circleci.com/docs/2.0/language-java/ for more details
 #
 version: 2
+
+defaults: &defaults
+  working_directory: /tmp
+
 jobs:
   publish-github-release:
     docker:
       - image: circleci/golang:1.8
     steps:
       - attach_workspace:
-          at: ~/buildArtefacts
+          at: /tmp/buildArtefacts
       - run:
           name: "Publish Release on GitHub"
           command: |
             go get github.com/tcnksm/ghr
             VERSION=v1.0.0-SNAPSHOT
-            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ~/buildArtefacts/
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} /tmp/buildArtefacts/
 
 
   build:
@@ -51,24 +55,22 @@ jobs:
       - run:
           name: Save test results
           command: |
-            mkdir -p ~/buildArtefacts/
-            find . -type f -regex ".*/target/.*-shaded.jar" -exec cp {} ~/buildArtefacts/ \;
+            mkdir -p /tmp/buildArtefacts/
+            find . -type f -regex ".*/target/.*-shaded.jar" -exec cp {} /tmp/buildArtefacts/ \;
           when: always
       - store_artifacts:
-          path: ~/buildArtefacts
+          path: /tmp/buildArtefacts
 
 
       - run:
           name: Save test results
           command: |
-            mkdir -p ~/junit/
-            find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} ~/junit/ \;
+            mkdir -p /tmp/junit/
+            find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} /tmp/junit/ \;
           when: always
       - store_test_results:
-          path: ~/junit
+          path: /tmp/junit
 
-      - store_artifacts:
-          path: ~/junit
 
 workflows:
   version: 2
@@ -82,8 +84,8 @@ workflows:
       - publish-github-release:
           requires:
             - build
-          filters:
-            tags:
-              only: /^v.*/
-            branches:
-              ignore: /.*/
+#          filters:
+#            tags:
+#              only: /^v.*/
+#            branches:
+#              ignore: /.*/
