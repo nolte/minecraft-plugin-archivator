@@ -10,9 +10,17 @@ defaults: &defaults
 jobs:
   generate-changelog:
     machine: true
+    working_directory: /tmp/changelog
     steps:
       - run: |
           docker run -it --rm -v "$(pwd)":/usr/local/src/your-app ferrarimarco/github-changelog-generator:1.15.0.pre.beta --user nolte --project minecraft-plugin-archivator --token ${GITHUB_TOKEN}
+      - persist_to_workspace:
+          # Must be an absolute path, or relative path from working_directory. This is a directory on the container which is
+          # taken to be the root directory of the workspace.
+          root: /tmp/changelog
+          # Must be relative path from root
+          paths:
+              - CHANGELOG.md
 
 
   publish-github-release:
