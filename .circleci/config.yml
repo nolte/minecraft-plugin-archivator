@@ -30,17 +30,9 @@ jobs:
       - attach_workspace:
           at: /tmp/workspace
       - run:
-          name: read changelog
-          command: |
-            mapfile < /tmp/workspace/CHANGELOG.md lines
-            printf "%s" "${lines[@]}"
-      - run:
           name: "Publish Release on GitHub"
           command: |
             go get github.com/tcnksm/ghr
-            printf "%s" "${lines[@]}"
-            mapfile < /tmp/workspace/CHANGELOG.md lines
-            printf "%s" "${lines[@]}"
             message="$(cat /tmp/workspace/CHANGELOG.md)"
             ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -b "${message}" -delete ${CIRCLE_TAG} /tmp/workspace/buildArtefacts/
 
