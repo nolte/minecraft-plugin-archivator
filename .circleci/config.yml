@@ -49,7 +49,7 @@ jobs:
           name: Save test results
           command: |
             mkdir -p ~/buildArtefacts/
-            find . -type f -regex ".*/target/.*jar" -exec cp {} ~/buildArtefacts/ \;
+            find . -type f -regex ".*/target/.*-shaded.jar" -exec cp {} ~/buildArtefacts/ \;
           when: always
       - store_artifacts:
           path: ~/buildArtefacts
@@ -73,9 +73,10 @@ workflows:
     jobs:
       - build
 
-      - release-reating:
-          type: approval
-          requires:
-            - build
       # test optional goal
       - release_create
+        requires:
+          - build
+        filters:
+          tags:
+            only: v.*
