@@ -41,7 +41,7 @@ jobs:
             printf "%s" "${lines[@]}"
             mapfile < /tmp/workspace/CHANGELOG.md lines
             printf "%s" "${lines[@]}"
-            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -b "${lines[@]}" -delete ${CIRCLE_TAG} /tmp/workspace/buildArtefacts/
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -b "fofa" -delete ${CIRCLE_TAG} /tmp/workspace/buildArtefacts/
 
 
   build:
