@@ -14,6 +14,10 @@ jobs:
     steps:
       - run: |
           docker run -it --rm -v "$(pwd)":/usr/local/src/your-app ferrarimarco/github-changelog-generator:1.15.0.pre.beta --user nolte --project minecraft-plugin-archivator --token ${GITHUB_TOKEN}
+
+      - store_artifacts:
+          path: /tmp/workspace
+
       - persist_to_workspace:
           # Must be an absolute path, or relative path from working_directory. This is a directory on the container which is
           # taken to be the root directory of the workspace.
@@ -73,8 +77,8 @@ jobs:
             find . -type f -regex ".*/target/.*-shaded.jar" -exec cp {} /tmp/workspace/buildArtefacts/ \;
           when: always
 
-  #    - store_artifacts:
-  #        path: /tmp/buildArtefacts
+      - store_artifacts:
+          path: /tmp/workspace/buildArtefacts
 
       # Persist the specified paths (workspace/echo-output) into the workspace for use in downstream job.
       - persist_to_workspace:
