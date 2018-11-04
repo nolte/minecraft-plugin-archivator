@@ -105,7 +105,10 @@ workflows:
   version: 2
   build-deploy:
     jobs:
-      - generate-changelog
+      - generate-changelog:
+          filters:  # required since `deploy` has tag filters AND requires `build`
+            tags:
+              only: /.*/
       - build:
           filters:  # required since `deploy` has tag filters AND requires `build`
             tags:
