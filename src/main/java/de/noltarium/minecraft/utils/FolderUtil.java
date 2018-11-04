@@ -2,7 +2,6 @@ package de.noltarium.minecraft.utils;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
 public class FolderUtil {

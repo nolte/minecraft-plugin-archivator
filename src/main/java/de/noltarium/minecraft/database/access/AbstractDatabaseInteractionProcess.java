@@ -24,7 +24,7 @@ public abstract class AbstractDatabaseInteractionProcess<T> {
 		try {
 			logger.fine("update last successful backup");
 			connection = datasource.getConnection();
-			
+
 			return executeConnectionTask(connection);
 		} catch (SQLException e) {
 			logger.severe("faild to execute sql");

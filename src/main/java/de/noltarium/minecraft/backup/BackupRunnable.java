@@ -1,8 +1,5 @@
 package de.noltarium.minecraft.backup;
 
-import java.io.File;
-import java.util.List;
-
 import de.noltarium.minecraft.backup.model.BackupProcessStrategyType;
 import de.noltarium.minecraft.backup.steps.ArchiveBaseFolderPreparation;
 import de.noltarium.minecraft.backup.steps.ArchiveTempBaseFolderPreparation;

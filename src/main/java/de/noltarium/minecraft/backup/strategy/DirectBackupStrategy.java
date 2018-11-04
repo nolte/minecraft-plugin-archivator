@@ -1,7 +1,6 @@
 package de.noltarium.minecraft.backup.strategy;
 
 import java.io.File;
-import java.nio.file.Path;
 import java.util.List;
 
 import de.noltarium.minecraft.backup.steps.ArchiveBaseFolderPreparation;

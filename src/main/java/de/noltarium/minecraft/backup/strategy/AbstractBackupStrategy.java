@@ -6,7 +6,6 @@ import static de.noltarium.minecraft.config.ArchivatorConfigurationFacade.humanR
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.sql.Date;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;

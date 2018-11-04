@@ -54,7 +54,7 @@ public class BackupService {
 			BackupEntity run = BackupEntity.builder().planedBackupFiles(backupSources).backupRunId(archiveId)
 					.startTime(startTime).build();
 			databaseFacade.insertNewBackupRun(run);
-			
+
 			thread = new Thread(new BackupRunnable(run, chat, config, databaseFacade));
 			thread.start();
 		}

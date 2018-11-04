@@ -31,7 +31,7 @@ public class BackupConfigFileProvider implements BackupConfigProvider {
 	private final FileConfiguration pluginConfig;
 	private final File dataDir;
 
-	public BackupConfigFileProvider(File dataDir,FileConfiguration pluginConfig) {
+	public BackupConfigFileProvider(File dataDir, FileConfiguration pluginConfig) {
 		this.dataDir = dataDir;
 		this.pluginConfig = pluginConfig;
 	}
@@ -45,12 +45,11 @@ public class BackupConfigFileProvider implements BackupConfigProvider {
 	public String getArchiveNameFormat() {
 		return pluginConfig.getString(BACKUP_ARCHIVE_NAME_KEY);
 	}
-	
+
 	@Override
 	public ArchiveType getArchiveType() {
 		return ArchiveType.fromString(pluginConfig.getString(BACKUP_ARCHIVE_FORMAT_KEY));
 	}
-
 
 	@Override
 	public BackupProcessStrategyType getBackupStrategy() {
@@ -59,12 +58,12 @@ public class BackupConfigFileProvider implements BackupConfigProvider {
 
 	@Override
 	public Path getBackupWorkingPath() {
-		return java.nio.file.Paths.get(dataDir.getAbsolutePath(),pluginConfig.getString(BACKUP_WORKING_DIR_KEY));
+		return java.nio.file.Paths.get(dataDir.getAbsolutePath(), pluginConfig.getString(BACKUP_WORKING_DIR_KEY));
 	}
 
 	@Override
 	public Path getBackupArchivePath() {
-		return java.nio.file.Paths.get(dataDir.getAbsolutePath(),pluginConfig.getString(BACKUP_ARCHIVE_DIR_KEY));
+		return java.nio.file.Paths.get(dataDir.getAbsolutePath(), pluginConfig.getString(BACKUP_ARCHIVE_DIR_KEY));
 	}
 
 	@Override

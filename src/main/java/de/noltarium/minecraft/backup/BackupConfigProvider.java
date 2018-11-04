@@ -18,7 +18,7 @@ public interface BackupConfigProvider {
 	String getArchiveNameFormat();
 
 	ArchiveType getArchiveType();
-	
+
 	Integer getMaxKeepedBackups();
 
 }
