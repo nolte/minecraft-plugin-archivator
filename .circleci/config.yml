@@ -19,10 +19,7 @@ jobs:
           command: |
             go get github.com/tcnksm/ghr
             VERSION=${CIRCLE_BRANCH}
-            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} \
-              -delete ${VERSION} /tmp/workspace/buildArtefacts/ \
-              --draft true \
-              --prerelease true
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${CIRCLE_BRANCH} /tmp/workspace/buildArtefacts/ --draft true --prerelease true
 
 
   build:
