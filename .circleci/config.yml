@@ -9,8 +9,8 @@ defaults: &defaults
 
 jobs:
   generate-changelog:
+    machine: true
     steps:
-      - setup_remote_docker
       - run: |
           docker run -it --rm -v "$(pwd)":/usr/local/src/your-app ferrarimarco/github-changelog-generator:1.15.0.pre.beta --user nolte --project minecraft-plugin-archivator --token ${GITHUB_TOKEN}
 
