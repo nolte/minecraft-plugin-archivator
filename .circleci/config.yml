@@ -4,15 +4,18 @@
 #
 version: 2
 jobs:
-  release_create:
+  publish-github-release:
     docker:
-      # specify the version you desire here
-      - image: circleci/openjdk:8-jdk
+      - image: circleci/golang:1.8
     steps:
+      - attach_workspace:
+          at: ~/buildArtefacts
       - run:
-          name: publish
+          name: "Publish Release on GitHub"
           command: |
-            echo "Foba"
+            go get github.com/tcnksm/ghr
+            VERSION=v1.0.0-SNAPSHOT
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./artifacts/
 
 
   build:
@@ -76,7 +79,7 @@ workflows:
             tags:
               only: /.*/
       # test optional goal
-      - release_create:
+      - publish-github-release:
           requires:
             - build
           filters:
