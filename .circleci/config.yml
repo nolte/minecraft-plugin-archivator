@@ -8,18 +8,12 @@ jobs:
     docker:
       # specify the version you desire here
       - image: circleci/openjdk:8-jdk
-      
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/postgres:9.4
-
     working_directory: ~/repo
 
     environment:
       # Customize the JVM maximum heap limit
       MAVEN_OPTS: -Xmx3200m
-    
+
     steps:
       - checkout
 
@@ -36,10 +30,9 @@ jobs:
           paths:
             - ~/.m2
           key: v1-dependencies-{{ checksum "pom.xml" }}
-        
+
       # run tests!
       - run: mvn integration-test
-
 
       - run:
           name: Save test results
@@ -59,6 +52,12 @@ jobs:
           when: always
       - store_test_results:
           path: ~/junit
-      
+
       - store_artifacts:
-          path: ~/junit   
+          path: ~/junit
+
+workflows:
+  version: 2
+  build-deploy:
+    jobs:
+      - build
