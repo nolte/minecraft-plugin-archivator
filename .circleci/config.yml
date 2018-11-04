@@ -10,14 +10,14 @@ defaults: &defaults
 jobs:
   generate-changelog:
     machine: true
-    working_directory: /tmp/changelog
+    working_directory: /tmp/workspace
     steps:
       - run: |
           docker run -it --rm -v "$(pwd)":/usr/local/src/your-app ferrarimarco/github-changelog-generator:1.15.0.pre.beta --user nolte --project minecraft-plugin-archivator --token ${GITHUB_TOKEN}
       - persist_to_workspace:
           # Must be an absolute path, or relative path from working_directory. This is a directory on the container which is
           # taken to be the root directory of the workspace.
-          root: /tmp/changelog
+          root: /tmp/workspace
           # Must be relative path from root
           paths:
               - CHANGELOG.md
@@ -30,11 +30,16 @@ jobs:
       - attach_workspace:
           at: /tmp/workspace
       - run:
+          name: read changelog
+          command: |
+            mapfile < /tmp/workspace/CHANGELOG.md lines
+            printf "%s" "${lines[@]}"
+      - run:
           name: "Publish Release on GitHub"
           command: |
             go get github.com/tcnksm/ghr
-            VERSION=""
-            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${CIRCLE_TAG} /tmp/workspace/buildArtefacts/
+            VERSION="cat "
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${CIRCLE_TAG} /tmp/workspace/buildArtefacts/ -b ${lines[@]}
 
 
   build:
@@ -109,8 +114,9 @@ workflows:
       - publish-github-release:
           requires:
             - build
-          filters:
-            tags:
-              only: /^v.*/
-            branches:
-              ignore: /.*/
+            - generate-changelog
+#          filters:
+#            tags:
+#              only: /^v.*/
+#            branches:
+#              ignore: /.*/
