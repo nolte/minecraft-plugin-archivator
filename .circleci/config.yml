@@ -54,7 +54,7 @@ jobs:
       - run:
           name: Save test results
           command: |
-            mkdir -p /tmp/buildArtefacts/
+            mkdir -p /tmp/workspace/buildArtefacts/
             find . -type f -regex ".*/target/.*-shaded.jar" -exec cp {} /tmp/workspace/buildArtefacts/ \;
           when: always
 
