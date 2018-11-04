@@ -4,6 +4,17 @@
 #
 version: 2
 jobs:
+  release_create:
+    docker:
+      # specify the version you desire here
+      - image: circleci/openjdk:8-jdk
+    steps:
+      - run:
+          name: publish
+          command: |
+            echo "Foba"
+
+
   build:
     docker:
       # specify the version you desire here
@@ -62,9 +73,9 @@ workflows:
     jobs:
       - build
 
-      - request-testing:
+      - release-reating:
           type: approval
           requires:
             - build
       # test optional goal
-      - run: mvn clean
+      - release_create
