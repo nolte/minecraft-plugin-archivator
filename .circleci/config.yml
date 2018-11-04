@@ -39,7 +39,7 @@ jobs:
           command: |
             go get github.com/tcnksm/ghr
             VERSION="cat "
-            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${CIRCLE_TAG} /tmp/workspace/buildArtefacts/ -b ${lines[@]}
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -b ${lines[@]} -delete ${CIRCLE_TAG} /tmp/workspace/buildArtefacts/
 
 
   build:
