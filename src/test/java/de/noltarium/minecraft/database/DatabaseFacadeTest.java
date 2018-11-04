@@ -71,17 +71,4 @@ public class DatabaseFacadeTest {
 		List<BackupEntity> runs = facade.loadBackupRuns();
 		assertThat(runs.size(), is(1));
 	}
-	@Test
-	public void testName() throws Exception {
-		//get a predefined instance
-		CronDefinition cronDefinition =
-		CronDefinitionBuilder.instanceDefinitionFor(CronType.QUARTZ);
-
-		//create a parser based on provided definition
-		CronParser parser = new CronParser(cronDefinition);
-		Cron quartzCron = parser.parse("*/45 * * * * ?");
-		
-		CronDefinition foba = quartzCron.getCronDefinition();
-		System.out.println(foba);
-	}
 }
