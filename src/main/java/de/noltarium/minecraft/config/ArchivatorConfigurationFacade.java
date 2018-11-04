@@ -102,7 +102,7 @@ public class ArchivatorConfigurationFacade {
 			throw new InvalidConfigurationException("Unsupported sql database type:" + type);
 		}
 
-		return new DatabaseHandler(type, tablePrefix, dsFactory);
+		return new DatabaseHandler(tablePrefix, dsFactory);
 	}
 
 }
