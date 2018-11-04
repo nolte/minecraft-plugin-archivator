@@ -38,11 +38,18 @@ jobs:
           key: v1-dependencies-{{ checksum "pom.xml" }}
         
       # run tests!
-      - run: mvn package
+      - run: mvn integration-test
 
+
+      - run:
+          name: Save test results
+          command: |
+            mkdir -p ~/buildArtefacts/
+            find . -type f -regex ".*/target/.*jar" -exec cp {} ~/buildArtefacts/ \;
+          when: always
       - store_artifacts:
-          path: "target/minecraft-backup-archiver-0.0.1-SNAPSHOT-shaded.jar"
-          destination: minecraft-backup-archiver.jar
+          path: ~/buildArtefacts
+
 
       - run:
           name: Save test results
@@ -53,5 +60,5 @@ jobs:
       - store_test_results:
           path: ~/junit
       
- #     - store_artifacts:
- #         path: ~/junit   
+      - store_artifacts:
+          path: ~/junit   
