@@ -21,7 +21,7 @@ jobs:
             VERSION=${CIRCLE_BRANCH}
             ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} \
               -delete ${VERSION} /tmp/workspace/buildArtefacts/ \
-              --draft true
+              --draft true \
               --prerelease true
 
 
