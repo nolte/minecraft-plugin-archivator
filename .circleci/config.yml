@@ -61,3 +61,10 @@ workflows:
   build-deploy:
     jobs:
       - build
+
+      - request-testing:
+          type: approval
+          requires:
+            - build
+      # test optional goal
+      - run: mvn clean
