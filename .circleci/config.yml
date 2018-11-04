@@ -18,8 +18,8 @@ jobs:
           name: "Publish Release on GitHub"
           command: |
             go get github.com/tcnksm/ghr
-            VERSION=${CIRCLE_BRANCH}
-            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${CIRCLE_BRANCH} /tmp/workspace/buildArtefacts/ --draft true --prerelease true
+            VERSION=""
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${CIRCLE_BRANCH} /tmp/workspace/buildArtefacts/
 
 
   build:
@@ -93,8 +93,8 @@ workflows:
       - publish-github-release:
           requires:
             - build
-          filters:
-            tags:
-              only: /^v.*/
-            branches:
-              ignore: /.*/
+  #        filters:
+  #          tags:
+  #            only: /^v.*/
+  #          branches:
+  #            ignore: /.*/
