@@ -8,6 +8,21 @@ defaults: &defaults
   working_directory: /tmp
 
 jobs:
+  start-release:
+    docker:
+      - image: circleci/openjdk:8-jdk
+
+    environment:
+      # Customize the JVM maximum heap limit
+      MAVEN_OPTS: -Xmx3200m
+
+    steps:
+      - checkout
+
+      # run tests!
+      - run: mvn clean
+
+
   generate-changelog:
     machine: true
     working_directory: /tmp/workspace
@@ -19,10 +34,7 @@ jobs:
           path: /tmp/workspace
 
       - persist_to_workspace:
-          # Must be an absolute path, or relative path from working_directory. This is a directory on the container which is
-          # taken to be the root directory of the workspace.
           root: /tmp/workspace
-          # Must be relative path from root
           paths:
               - CHANGELOG.md
 
@@ -40,10 +52,8 @@ jobs:
             message="$(cat /tmp/workspace/CHANGELOG.md)"
             ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -b "${message}" -delete ${CIRCLE_TAG} /tmp/workspace/buildArtefacts/
 
-
   build:
     docker:
-      # specify the version you desire here
       - image: circleci/openjdk:8-jdk
 
     environment:
@@ -99,26 +109,53 @@ jobs:
       - store_test_results:
           path: /tmp/junit
 
-
 workflows:
   version: 2
-  build-deploy:
-    jobs:
-      - generate-changelog:
-          filters:  # required since `deploy` has tag filters AND requires `build`
-            tags:
-              only: /.*/
-      - build:
-          filters:  # required since `deploy` has tag filters AND requires `build`
-            tags:
-              only: /.*/
-      # test optional goal
-      - publish-github-release:
-          requires:
-            - build
-            - generate-changelog
-          filters:
-            tags:
-              only: /^v.*/
-            branches:
-              ignore: /.*/
+  development-build:
+    - build:
+        filters:
+          branches:
+            only: /develop/
+
+    - hold:
+        type: approval
+        requires:
+          - build
+
+    - start-release:
+        requires:
+          - hold
+
+
+  release-build:
+    - build:
+        filters:
+          branches:
+            only: /release.*/
+
+  release-finished-build:
+    - build:
+        filters:
+          branches:
+            only: /master/
+
+#  build-deploy:
+#    jobs:
+#      - generate-changelog:
+#          filters:
+#            tags:
+#              only: /.*/
+#      - build:
+#          filters:
+#            tags:
+#              only: /.*/
+#      - publish-github-release:
+#          requires:
+#            - build
+#            - generate-changelog
+#          filters:
+#            tags:
+#              only: /^v.*/
+#            branches:
+#              ignore: /.*/
+#
