@@ -112,32 +112,35 @@ jobs:
 workflows:
   version: 2
   development-build:
-    - build:
-        filters:
-          branches:
-            only: /develop/
+    jobs:
+      - build:
+          filters:
+            branches:
+              only: /develop/
 
-    - hold:
-        type: approval
-        requires:
-          - build
+      - hold:
+          type: approval
+          requires:
+            - build
 
-    - start-release:
-        requires:
-          - hold
+      - start-release:
+          requires:
+            - hold
 
 
   release-build:
-    - build:
-        filters:
-          branches:
-            only: /release.*/
+    jobs:
+      - build:
+          filters:
+            branches:
+              only: /release.*/
 
   release-finished-build:
-    - build:
-        filters:
-          branches:
-            only: /master/
+    jobs:
+      - build:
+          filters:
+            branches:
+              only: /master/
 
 #  build-deploy:
 #    jobs:
