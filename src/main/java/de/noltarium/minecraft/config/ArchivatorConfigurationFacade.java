@@ -41,6 +41,7 @@ public class ArchivatorConfigurationFacade {
 	}
 
 	private void initConfig(Archivator archivator) throws InvalidConfigurationException {
+		InputStreamReader reader = null;
 		try {
 			// check that the plugin folder is presented
 			File pluginDataFolder = archivator.getDataFolder();
@@ -55,7 +56,9 @@ public class ArchivatorConfigurationFacade {
 
 			YamlConfiguration pluginConfigFileDefaultConfiguration = new YamlConfiguration();
 			InputStream in = this.getClass().getClassLoader().getResourceAsStream("config-default.yml");
-			pluginConfigFileDefaultConfiguration.load(new InputStreamReader(in));
+
+			reader = new InputStreamReader(in);
+			pluginConfigFileDefaultConfiguration.load(reader);
 
 			if (!configFile.exists()) {
 				// load the existing config
@@ -80,6 +83,13 @@ public class ArchivatorConfigurationFacade {
 				InvalidConfigurationException e) {
 			e.printStackTrace();
 			throw new InvalidConfigurationException(e);
+		} finally {
+			if (reader != null)
+				try {
+					reader.close();
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
 		}
 	}
 
