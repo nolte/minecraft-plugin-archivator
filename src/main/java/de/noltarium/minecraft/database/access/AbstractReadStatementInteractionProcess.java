@@ -30,7 +30,8 @@ public abstract class AbstractReadStatementInteractionProcess<T> extends Abstrac
 			throw new RuntimeException(e);
 		} finally {
 			try {
-				rs.close();
+				if (rs != null)
+					rs.close();
 			} catch (SQLException e1) {
 				e1.printStackTrace();
 				throw new RuntimeException(e1);

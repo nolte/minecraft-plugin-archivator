@@ -3,23 +3,63 @@
 # Check https://circleci.com/docs/2.0/language-java/ for more details
 #
 version: 2
-jobs:
-  build:
-    docker:
-      # specify the version you desire here
-      - image: circleci/openjdk:8-jdk
-      
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/postgres:9.4
 
-    working_directory: ~/repo
+defaults: &defaults
+  working_directory: /tmp
+
+jobs:
+  start-release:
+    docker:
+      - image: circleci/openjdk:8-jdk
 
     environment:
       # Customize the JVM maximum heap limit
       MAVEN_OPTS: -Xmx3200m
-    
+
+    steps:
+      - checkout
+
+      # run tests!
+      - run: mvn clean
+
+
+  generate-changelog:
+    machine: true
+    working_directory: /tmp/workspace
+    steps:
+      - run: |
+          docker run -it --rm -v "$(pwd)":/usr/local/src/your-app ferrarimarco/github-changelog-generator:1.15.0.pre.beta --user nolte --project minecraft-plugin-archivator --token ${GITHUB_TOKEN}
+
+      - store_artifacts:
+          path: /tmp/workspace
+
+      - persist_to_workspace:
+          root: /tmp/workspace
+          paths:
+              - CHANGELOG.md
+
+
+  publish-github-release:
+    docker:
+      - image: circleci/golang:1.8
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+      - run:
+          name: "Publish Release on GitHub"
+          command: |
+            go get github.com/tcnksm/ghr
+            message="$(cat /tmp/workspace/CHANGELOG.md)"
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -b "${message}" -delete ${CIRCLE_TAG} /tmp/workspace/buildArtefacts/
+
+  build:
+    docker:
+      - image: circleci/openjdk:8-jdk
+
+    environment:
+      # Customize the JVM maximum heap limit
+      MAVEN_OPTS: -Xmx3200m
+
     steps:
       - checkout
 
@@ -36,29 +76,89 @@ jobs:
           paths:
             - ~/.m2
           key: v1-dependencies-{{ checksum "pom.xml" }}
-        
+
       # run tests!
       - run: mvn integration-test
 
-
       - run:
           name: Save test results
           command: |
-            mkdir -p ~/buildArtefacts/
-            find . -type f -regex ".*/target/.*jar" -exec cp {} ~/buildArtefacts/ \;
+            mkdir -p /tmp/workspace/buildArtefacts/
+            find . -type f -regex ".*/target/.*-shaded.jar" -exec cp {} /tmp/workspace/buildArtefacts/ \;
           when: always
+
       - store_artifacts:
-          path: ~/buildArtefacts
+          path: /tmp/workspace/buildArtefacts
+
+      # Persist the specified paths (workspace/echo-output) into the workspace for use in downstream job.
+      - persist_to_workspace:
+          # Must be an absolute path, or relative path from working_directory. This is a directory on the container which is
+          # taken to be the root directory of the workspace.
+          root: /tmp/workspace
+          # Must be relative path from root
+          paths:
+              - buildArtefacts
 
 
       - run:
           name: Save test results
           command: |
-            mkdir -p ~/junit/
-            find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} ~/junit/ \;
+            mkdir -p /tmp/junit/
+            find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} /tmp/junit/ \;
           when: always
       - store_test_results:
-          path: ~/junit
-      
-      - store_artifacts:
-          path: ~/junit   
+          path: /tmp/junit
+
+workflows:
+  version: 2
+  development-build:
+    jobs:
+      - build:
+          filters:
+            branches:
+              only: /develop/
+
+      - hold:
+          type: approval
+          requires:
+            - build
+
+      - start-release:
+          requires:
+            - hold
+
+
+  release-build:
+    jobs:
+      - build:
+          filters:
+            branches:
+              only: /release.*/
+
+  release-finished-build:
+    jobs:
+      - build:
+          filters:
+            branches:
+              only: /master/
+
+#  build-deploy:
+#    jobs:
+#      - generate-changelog:
+#          filters:
+#            tags:
+#              only: /.*/
+#      - build:
+#          filters:
+#            tags:
+#              only: /.*/
+#      - publish-github-release:
+#          requires:
+#            - build
+#            - generate-changelog
+#          filters:
+#            tags:
+#              only: /^v.*/
+#            branches:
+#              ignore: /.*/
+#
