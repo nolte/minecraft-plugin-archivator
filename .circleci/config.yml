@@ -111,6 +111,10 @@ jobs:
 
 workflows:
   version: 2
+  staticfilesgeneration:
+    jobs:
+      - generate-changelog
+
   development-build:
     jobs:
       - build:
