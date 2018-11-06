@@ -9,25 +9,25 @@ defaults: &defaults
 
 jobs:
 
-finish-release:
-  docker:
-    - image: circleci/openjdk:8-jdk
+  finish-release:
+    docker:
+      - image: circleci/openjdk:8-jdk
 
-  environment:
-    # Customize the JVM maximum heap limit
-    MAVEN_OPTS: -Xmx3200m
+    environment:
+      # Customize the JVM maximum heap limit
+      MAVEN_OPTS: -Xmx3200m
 
-  steps:
-    - add_ssh_keys:
-        fingerprints:
-          - "2a:3b:9b:1d:ff:0c:ce:c3:28:8e:5e:74:07:fa:fe:3c"
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "2a:3b:9b:1d:ff:0c:ce:c3:28:8e:5e:74:07:fa:fe:3c"
 
-    - checkout
+      - checkout
 
-    - run: |
-        git config --global user.email "$GIT_AUTHOR_EMAIL"
-        git config --global user.name "$GIT_AUTHOR_NAME"
-        mvn -B gitflow:release-finish -DpushRemote=true -DallowSnapshots=true
+      - run: |
+          git config --global user.email "$GIT_AUTHOR_EMAIL"
+          git config --global user.name "$GIT_AUTHOR_NAME"
+          mvn -B gitflow:release-finish -DpushRemote=true -DallowSnapshots=true
 
   start-release:
     docker:
