@@ -9,6 +9,36 @@ defaults: &defaults
 
 jobs:
 
+  releaseplayground:
+    docker:
+      - image: circleci/openjdk:8-jdk
+
+    environment:
+      # Customize the JVM maximum heap limit
+      MAVEN_OPTS: -Xmx3200m
+
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "2a:3b:9b:1d:ff:0c:ce:c3:28:8e:5e:74:07:fa:fe:3c"
+
+      - checkout
+      - run: |
+          MVN_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
+          curl -X POST \
+            https://api.github.com/repos/nolte/minecraft-plugin-archivator/releases \
+            -H 'authorization: token ${GITHUB_TOKEN}' \
+            -H 'content-type: application/json' \
+            -d '{
+            "tag_name": "v${MVN_VERSION}",
+            "target_commitish": "master",
+            "name": "v${MVN_VERSION}",
+            "body": "Description of the release",
+            "draft": true,
+            "prerelease": true
+          }'
+
+
   finish-release:
     docker:
       - image: circleci/openjdk:8-jdk
@@ -28,6 +58,22 @@ jobs:
           git config --global user.email "$GIT_AUTHOR_EMAIL"
           git config --global user.name "$GIT_AUTHOR_NAME"
           mvn -B gitflow:release-finish -DpushRemote=true -DallowSnapshots=true
+
+      - run: |
+          MVN_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
+          curl -X POST \
+            https://api.github.com/repos/nolte/minecraft-plugin-archivator/releases \
+            -H 'authorization: token ${GITHUB_TOKEN}' \
+            -H 'content-type: application/json' \
+            -d '{
+            "tag_name": "v${MVN_VERSION}",
+            "target_commitish": "master",
+            "name": "v${MVN_VERSION}",
+            "body": "Description of the release",
+            "draft": true,
+            "prerelease": true
+          }'
+
 
   start-release:
     docker:
@@ -144,6 +190,7 @@ workflows:
 
   development-build:
     jobs:
+      - releaseplayground
       - build:
           filters:
             branches:
