@@ -275,7 +275,9 @@
 				<artifactId>gitflow-maven-plugin</artifactId>
 				<version>1.10.0</version>
 				<configuration>
-					<!-- optional configuration -->
+					<gitFlowConfig>
+						<versionTagPrefix>v</versionTagPrefix>
+					</gitFlowConfig>
 				</configuration>
 			</plugin>
 		</plugins>
