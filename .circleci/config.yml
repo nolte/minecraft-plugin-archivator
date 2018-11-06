@@ -164,7 +164,7 @@ workflows:
       - finish-release:
           filters:
             branches:
-              only: /release/.*
+              only: /release.*/
 
   release-finished-build:
     jobs:
