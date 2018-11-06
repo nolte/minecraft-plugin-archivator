@@ -173,7 +173,7 @@ jobs:
               --tag v0.1.3 \
               --name "the wolf of source street" \
               --description "${message}" \
-              --pre-release
+              --pre-release \
               --draft
 
 
