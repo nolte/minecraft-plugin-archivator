@@ -167,7 +167,6 @@ jobs:
           command: |
             go get github.com/aktau/github-release
             message="$(cat /tmp/workspace/CHANGELOG.md)"
-            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -b "${message}" -delete ${CIRCLE_TAG} /tmp/workspace/buildArtefacts/
             github-release release \
               --user ${CIRCLE_PROJECT_USERNAME} \
               --repo ${CIRCLE_PROJECT_REPONAME} \
