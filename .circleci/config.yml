@@ -20,7 +20,7 @@ jobs:
       - checkout
 
       # run tests!
-      - run: mvn gitflow:release-start
+      - run: mvn gitflow:release-start -DpushRemote=true
 
 
   generate-changelog:
