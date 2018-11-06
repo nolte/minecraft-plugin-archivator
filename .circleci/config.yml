@@ -39,7 +39,7 @@ jobs:
             "tag_name": "v'"${MVN_VERSION}"'",
             "target_commitish": "'"${CIRCLE_SHA1}"'",
             "name": "v'"${MVN_VERSION}"'",
-            "body": "'${CHANGELOG_MESSAGE}'",
+            "body": "'"${CHANGELOG_MESSAGE}"'",
             "draft": true,
             "prerelease": true
           }'
@@ -119,7 +119,7 @@ jobs:
             "tag_name": "v'"${MVN_VERSION}"'",
             "target_commitish": "'"${CIRCLE_SHA1}"'",
             "name": "v'"${MVN_VERSION}"'",
-            "body": "'"${CHANGELOG_MESSAGE}"'",
+            "body": "'${CHANGELOG_MESSAGE}"'",
             "draft": true,
             "prerelease": true
           }'
