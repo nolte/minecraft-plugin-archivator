@@ -20,6 +20,8 @@ jobs:
       - checkout
 
       # run tests!
+      - run: git config --global user.email "$GIT_AUTHOR_EMAIL"
+      - run: git config --global user.name "$GIT_AUTHOR_NAME"
       - run: mvn -B gitflow:release-start -DpushRemote=true -DallowSnapshots=true
 
 
