@@ -172,7 +172,6 @@ jobs:
               --repo ${CIRCLE_PROJECT_REPONAME} \
               --name "the wolf of source street" \
               --description "${message}" \
-              --pre-release \
               --draft
 
 
