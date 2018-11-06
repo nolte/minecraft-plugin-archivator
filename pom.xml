@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.noltarium.minecraft</groupId>
 	<artifactId>minecraft-backup-archiver</artifactId>
-	<version>0.0.2</version>
+	<version>0.0.3</version>
 	<repositories>
 		<repository>
 			<id>spigot-repo</id>
@@ -275,7 +275,9 @@
 				<artifactId>gitflow-maven-plugin</artifactId>
 				<version>1.10.0</version>
 				<configuration>
-					<!-- optional configuration -->
+					<gitFlowConfig>
+						<versionTagPrefix>v</versionTagPrefix>
+					</gitFlowConfig>
 				</configuration>
 			</plugin>
 		</plugins>
