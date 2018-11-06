@@ -25,18 +25,7 @@ jobs:
       - checkout
       - run: |
           MVN_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
-          curl -X POST \
-            https://api.github.com/repos/nolte/minecraft-plugin-archivator/releases \
-            -H 'authorization: token ${GITHUB_TOKEN}' \
-            -H 'content-type: application/json' \
-            -d '{
-            "tag_name": "v${MVN_VERSION}",
-            "target_commitish": "master",
-            "name": "v${MVN_VERSION}",
-            "body": "Description of the release",
-            "draft": true,
-            "prerelease": true
-          }'
+          curl -X POST https://api.github.com/repos/nolte/minecraft-plugin-archivator/releases -H 'authorization: token ${GITHUB_TOKEN}' -H 'content-type: application/json' -d '{ "tag_name": "v${MVN_VERSION}", "target_commitish": "master", "name": "v${MVN_VERSION}", "body": "Description of the release", "draft": true, "prerelease": true }'
 
 
   finish-release:
