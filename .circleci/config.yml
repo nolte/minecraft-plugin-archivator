@@ -31,6 +31,7 @@ jobs:
           MVN_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
           CHANGELOG_MESSAGE="$(cat /tmp/workspace/CHANGELOG.md)"
           echo $CHANGELOG_MESSAGE
+          CHANGELOG_MESSAGE="Pre Release"
           curl -X POST \
             https://api.github.com/repos/nolte/minecraft-plugin-archivator/releases \
             -H "authorization: token ${GITHUB_TOKEN}" \
