@@ -166,6 +166,7 @@ jobs:
           name: "Publish Release on GitHub"
           command: |
             go get github.com/aktau/github-release
+            ls -all /tmp/workspace
             message="$(cat /tmp/workspace/CHANGELOG.md)"
             current_version="$(cat /tmp/workspace/current_version.txt)"
             github-release release \
