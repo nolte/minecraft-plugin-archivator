@@ -89,7 +89,7 @@ jobs:
               --user ${CIRCLE_PROJECT_USERNAME} \
               --repo ${CIRCLE_PROJECT_REPONAME} \
               --tag "${current_version}" \
-              --name "minecraft-archivator-bukkit-v${current_version}" \
+              --name "minecraft-archivator-v${current_version}.jar" \
               --file /tmp/workspace/buildArtefacts/minecraft-backup-archiver-${current_version}-shaded.jar
 
   releaseplayground:
