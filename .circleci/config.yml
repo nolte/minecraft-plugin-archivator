@@ -207,6 +207,7 @@ jobs:
       
       - run: |
           MVN_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
+          mkdir -p /tmp/workspace/
           echo $MVN_VERSION > /tmp/workspace/current_version.txt
           
 
