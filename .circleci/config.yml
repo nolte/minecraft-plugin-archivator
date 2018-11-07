@@ -18,14 +18,20 @@ jobs:
       MAVEN_OPTS: -Xmx3200m
 
     steps:
+      - attach_workspace:
+          at: /tmp/workspace
+
       - add_ssh_keys:
           fingerprints:
             - "2a:3b:9b:1d:ff:0c:ce:c3:28:8e:5e:74:07:fa:fe:3c"
 
       - checkout
+
       - run: |
           MVN_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
-          echo $MVN_VERSION
+          CHANGELOG_MESSAGE="$(cat /tmp/workspace/CHANGELOG.md)"
+          echo $CHANGELOG_MESSAGE
+          CHANGELOG_MESSAGE="Pre Release"
           curl -X POST \
             https://api.github.com/repos/nolte/minecraft-plugin-archivator/releases \
             -H "authorization: token ${GITHUB_TOKEN}" \
@@ -34,7 +40,7 @@ jobs:
             "tag_name": "v'"${MVN_VERSION}"'",
             "target_commitish": "'"${CIRCLE_SHA1}"'",
             "name": "v'"${MVN_VERSION}"'",
-            "body": "Description of the release",
+            "body": "'"${CHANGELOG_MESSAGE}"'",
             "draft": true,
             "prerelease": true
           }'
@@ -103,7 +109,9 @@ jobs:
 
       - run: |
           MVN_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
-          message="$(cat /tmp/workspace/CHANGELOG.md)"
+          #CHANGELOG_MESSAGE="$(cat /tmp/workspace/CHANGELOG.md)"
+          CHANGELOG_MESSAGE="Pre Release"
+          echo $CHANGELOG_MESSAGE
           curl -X POST \
             https://api.github.com/repos/nolte/minecraft-plugin-archivator/releases \
             -H "authorization: token ${GITHUB_TOKEN}" \
@@ -112,7 +120,7 @@ jobs:
             "tag_name": "v'"${MVN_VERSION}"'",
             "target_commitish": "'"${CIRCLE_SHA1}"'",
             "name": "v'"${MVN_VERSION}"'",
-            "body": "'"${message}"'",
+            "body": "'${CHANGELOG_MESSAGE}"'",
             "draft": true,
             "prerelease": true
           }'
@@ -147,6 +155,29 @@ jobs:
             message="$(cat /tmp/workspace/CHANGELOG.md)"
             ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -b "${message}" -delete ${CIRCLE_TAG} /tmp/workspace/buildArtefacts/
 
+
+  releaseplayground2:
+    docker:
+      - image: circleci/golang:1.8
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+      - run:
+          name: "Publish Release on GitHub"
+          command: |
+            go get github.com/aktau/github-release
+            ls -all /tmp/workspace
+            message="$(cat /tmp/workspace/CHANGELOG.md)"
+            current_version="$(cat /tmp/workspace/current_version.txt)"
+            github-release release \
+              --user ${CIRCLE_PROJECT_USERNAME} \
+              --repo ${CIRCLE_PROJECT_REPONAME} \
+              --name "v${current_version}" \
+              --description "${message}" \
+              --tag "${current_version}" \
+              --draft
+
+
   build:
     docker:
       - image: circleci/openjdk:8-jdk
@@ -175,6 +206,12 @@ jobs:
       # run tests!
       - run: mvn integration-test
 
+      - run: |
+          MVN_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
+          mkdir -p /tmp/workspace/
+          echo $MVN_VERSION > /tmp/workspace/current_version.txt
+
+
       - run:
           name: Save test results
           command: |
@@ -185,6 +222,9 @@ jobs:
       - store_artifacts:
           path: /tmp/workspace/buildArtefacts
 
+      - store_artifacts:
+          path: /tmp/workspace/current_version.txt
+
       # Persist the specified paths (workspace/echo-output) into the workspace for use in downstream job.
       - persist_to_workspace:
           # Must be an absolute path, or relative path from working_directory. This is a directory on the container which is
@@ -193,6 +233,7 @@ jobs:
           # Must be relative path from root
           paths:
               - buildArtefacts
+              - current_version.txt
 
 
       - run:
@@ -236,10 +277,25 @@ workflows:
 
   release-build:
     jobs:
-      - finish-release:
+
+      - build:
           filters:
             branches:
               only: /release.*/
+
+      - generate-changelog:
+          filters:
+            branches:
+              only: /release.*/
+
+      - releaseplayground2:
+          requires:
+            - generate-changelog
+            - build
+
+      - finish-release:
+          requires:
+            - releaseplayground2
 
   release-finished-build:
     jobs:
