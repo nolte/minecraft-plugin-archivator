@@ -259,15 +259,19 @@ workflows:
             branches:
               only: /develop/
 
-      - releaseplayground2:
-          requires:
-            - generate-changelog
+
 
 
       - build:
           filters:
             branches:
               only: /develop/
+
+      - releaseplayground2:
+          requires:
+            - generate-changelog
+            - build
+
 
       - hold:
           type: approval
