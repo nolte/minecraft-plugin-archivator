@@ -227,9 +227,7 @@ workflows:
       - publish-github-release:
           requires:
             - releaseplayground
-            - publish-github-release
-
-
+            
       - finish-release:
           requires:
             - publish-github-release
