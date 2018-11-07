@@ -172,7 +172,7 @@ jobs:
             github-release release \
               --user ${CIRCLE_PROJECT_USERNAME} \
               --repo ${CIRCLE_PROJECT_REPONAME} \
-              --name "the wolf of source street" \
+              --name "v${current_version}" \
               --description "${message}" \
               --tag "${current_version}" \
               --draft
