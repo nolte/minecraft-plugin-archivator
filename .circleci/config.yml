@@ -167,11 +167,13 @@ jobs:
           command: |
             go get github.com/aktau/github-release
             message="$(cat /tmp/workspace/CHANGELOG.md)"
+            current_version="$(cat /tmp/workspace/current_version.txt)"
             github-release release \
               --user ${CIRCLE_PROJECT_USERNAME} \
               --repo ${CIRCLE_PROJECT_REPONAME} \
               --name "the wolf of source street" \
               --description "${message}" \
+              --tag "${current_version}" \
               --draft
 
 
@@ -202,6 +204,11 @@ jobs:
 
       # run tests!
       - run: mvn integration-test
+      
+      - run: |
+          MVN_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
+          echo $MVN_VERSION > /tmp/workspace/current_version.txt
+          
 
       - run:
           name: Save test results
@@ -212,6 +219,9 @@ jobs:
 
       - store_artifacts:
           path: /tmp/workspace/buildArtefacts
+          
+      - store_artifacts:
+          path: /tmp/workspace/current_version.txt          
 
       # Persist the specified paths (workspace/echo-output) into the workspace for use in downstream job.
       - persist_to_workspace:
@@ -221,6 +231,7 @@ jobs:
           # Must be relative path from root
           paths:
               - buildArtefacts
+              - current_version.txt
 
 
       - run:
