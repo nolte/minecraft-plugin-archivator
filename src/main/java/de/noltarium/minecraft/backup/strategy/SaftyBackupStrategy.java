@@ -79,8 +79,7 @@ public class SaftyBackupStrategy extends AbstractBackupStrategy<ArchiveTempBaseF
 			try {
 				FileUtils.deleteDirectory(backupWorkingRunDir);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				throw new RuntimeException(e);
 			}
 
 	}

@@ -17,8 +17,7 @@ public class AutoBackupSchedulingTask extends BukkitRunnable {
 		try {
 			backupService.startFullBackup();
 		} catch (BackupAlwaysRunningException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 
 	}

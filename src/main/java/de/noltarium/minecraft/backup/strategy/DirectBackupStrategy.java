@@ -27,7 +27,6 @@ public class DirectBackupStrategy extends AbstractBackupStrategy<ArchiveBaseFold
 
 	@Override
 	protected void finalyProcessStep() {
-		// TODO Auto-generated method stub
 
 	}
 
