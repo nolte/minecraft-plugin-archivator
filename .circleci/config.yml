@@ -205,12 +205,12 @@ jobs:
 
       # run tests!
       - run: mvn integration-test
-      
+
       - run: |
           MVN_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
           mkdir -p /tmp/workspace/
           echo $MVN_VERSION > /tmp/workspace/current_version.txt
-          
+
 
       - run:
           name: Save test results
@@ -221,9 +221,9 @@ jobs:
 
       - store_artifacts:
           path: /tmp/workspace/buildArtefacts
-          
+
       - store_artifacts:
-          path: /tmp/workspace/current_version.txt          
+          path: /tmp/workspace/current_version.txt
 
       # Persist the specified paths (workspace/echo-output) into the workspace for use in downstream job.
       - persist_to_workspace:
@@ -259,19 +259,10 @@ workflows:
             branches:
               only: /develop/
 
-
-
-
       - build:
           filters:
             branches:
               only: /develop/
-
-      - releaseplayground2:
-          requires:
-            - generate-changelog
-            - build
-
 
       - hold:
           type: approval
@@ -286,10 +277,25 @@ workflows:
 
   release-build:
     jobs:
-      - finish-release:
+
+      - build:
           filters:
             branches:
               only: /release.*/
+
+      - generate-changelog:
+          filters:
+            branches:
+              only: /release.*/
+
+      - releaseplayground2:
+          requires:
+            - generate-changelog
+            - build
+
+      - finish-release:
+          requires:
+            - releaseplayground2
 
   release-finished-build:
     jobs:
