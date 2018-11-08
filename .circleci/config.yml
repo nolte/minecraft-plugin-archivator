@@ -78,7 +78,7 @@ jobs:
     steps:
       - *run_task_load_latest_ghrelease
       - run: |
-
+          echo $LAST_VERSION
 
           docker run -it --rm -v "$(pwd)":/usr/local/src/your-app ferrarimarco/github-changelog-generator:1.15.0.pre.beta --user nolte --project minecraft-plugin-archivator --token ${GITHUB_TOKEN} --since-tag $LAST_VERSION
 
