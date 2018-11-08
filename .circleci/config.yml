@@ -1,6 +1,5 @@
-# Java Maven CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-java/ for more details
+# CircleCI 2.0 configuration file,
+# for handle the Release Process, used GitHub and the maven gitflow plugin
 #
 version: 2
 
@@ -20,6 +19,8 @@ aliases:
     docker:
       - image: circleci/golang:1.8
 
+  # @see https://circleci.com/docs/2.0/language-java/
+  # define the default java build environment
   - &container_mavenbuild
     docker:
       - image: circleci/openjdk:8-jdk
@@ -38,23 +39,40 @@ aliases:
   # @see https://stedolan.github.io/jq/
   # used for better JSon Command Line parsing.
   - &run_task_prepare_jq
-    run: |
-      sudo wget https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 -O /usr/bin/jq
-      sudo chmod +x /usr/bin/jq
+    run:
+      name: "install jq to path"
+      command: |
+        sudo wget https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 -O /usr/bin/jq
+        sudo chmod +x /usr/bin/jq
 
   # Load the latest GitHub Release
   # Reuqired jq in the path
+  # @see https://developer.github.com/v3/repos/releases/#get-the-latest-release
   - &run_task_load_latest_ghrelease
-    run: |
-      LAST_VERSION="$(curl https://${GITHUB_TOKEN}@api.github.com/repos/nolte/minecraft-plugin-archivator/releases/latest | jq -r '.tag_name' )"
-      echo $LAST_VERSION > /tmp/workspace/last_release.txt
+    run:
+      name: "Load the Latest GH Release"
+      command: |
+        LAST_VERSION="$(curl https://${GITHUB_TOKEN}@api.github.com/repos/nolte/minecraft-plugin-archivator/releases/latest | jq -r '.tag_name' )"
+        echo $LAST_VERSION > /tmp/workspace/last_release.txt
 
+  # Load one version behind the latest GitHub Release
+  # Reuqired jq in the path
+  # @see https://developer.github.com/v3/repos/releases/#list-releases-for-a-repository
+  - &run_task_load_previous_ghrelease
+    run: |
+      PREVIOUS_VERSION="$(curl https://${GITHUB_TOKEN}@api.github.com/repos/nolte/minecraft-plugin-archivator/releases | jq -r '.[1].tag_name' )"
+      echo $PREVIOUS_VERSION > /tmp/workspace/previous_release.txt
 
   - &run_task_configure_git
     run: |
       git config --global user.email "$GIT_AUTHOR_EMAIL"
       git config --global user.name "$GIT_AUTHOR_NAME"
 
+  - &run_task_mvn_extract_version_from_pom
+    run: |
+      MVN_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
+      mkdir -p /tmp/workspace/
+      echo $MVN_VERSION > /tmp/workspace/current_version.txt
 
 
 jobs:
@@ -71,13 +89,7 @@ jobs:
       - run: mvn -B gitflow:release-finish -DpushRemote=true -DallowSnapshots=true
 
   start-release:
-    docker:
-      - image: circleci/openjdk:8-jdk
-
-    environment:
-      # Customize the JVM maximum heap limit
-      MAVEN_OPTS: -Xmx3200m
-
+    <<: *container_mavenbuild
     steps:
 
       - attach_workspace:
@@ -138,7 +150,6 @@ jobs:
           name: "Publish Release on GitHub"
           command: |
             go get github.com/aktau/github-release
-            ls -all /tmp/workspace
             message="$(cat /tmp/workspace/CHANGELOG.md)"
             current_version="$(cat /tmp/workspace/current_version.txt)"
 
@@ -173,10 +184,7 @@ jobs:
       # run tests!
       - run: mvn integration-test
 
-      - run: |
-          MVN_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
-          mkdir -p /tmp/workspace/
-          echo $MVN_VERSION > /tmp/workspace/current_version.txt
+      - *run_task_mvn_extract_version_from_pom
 
       - run:
           name: Save test results
