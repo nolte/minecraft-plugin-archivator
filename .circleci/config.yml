@@ -59,9 +59,11 @@ aliases:
   # Reuqired jq in the path
   # @see https://developer.github.com/v3/repos/releases/#list-releases-for-a-repository
   - &run_task_load_previous_ghrelease
-    run: |
-      PREVIOUS_VERSION="$(curl https://${GITHUB_TOKEN}@api.github.com/repos/nolte/minecraft-plugin-archivator/releases | jq -r '.[1].tag_name' )"
-      echo $PREVIOUS_VERSION > /tmp/workspace/previous_release.txt
+    run:
+      name: Load the Previous GH Release
+      command: |
+        PREVIOUS_VERSION="$(curl https://${GITHUB_TOKEN}@api.github.com/repos/nolte/minecraft-plugin-archivator/releases | jq -r '.[1].tag_name' )"
+        echo $PREVIOUS_VERSION > /tmp/workspace/previous_release.txt
 
   - &run_task_configure_git
     run: |
@@ -69,10 +71,12 @@ aliases:
       git config --global user.name "$GIT_AUTHOR_NAME"
 
   - &run_task_mvn_extract_version_from_pom
-    run: |
-      MVN_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
-      mkdir -p /tmp/workspace/
-      echo $MVN_VERSION > /tmp/workspace/current_version.txt
+    run:
+      name: extract the current version from pom
+      command: |
+        MVN_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
+        mkdir -p /tmp/workspace/
+        echo $MVN_VERSION > /tmp/workspace/current_version.txt
 
 
 jobs:
