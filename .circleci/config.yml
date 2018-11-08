@@ -7,6 +7,14 @@ version: 2
 defaults: &defaults
   working_directory: /tmp
 
+aliases:
+  # Variables.
+  # For YAML support of anchors and references, @see http://blog.daemonl.com/2016/02/yaml.html
+  - &container_releasemanager
+    docker:
+      - image: circleci/golang:1.8
+
+
 jobs:
 
   finish-release:
@@ -79,8 +87,7 @@ jobs:
 
 
   publish-github-release:
-    docker:
-      - image: circleci/golang:1.8
+    <<: *container_releasemanager
     steps:
       - attach_workspace:
           at: /tmp/workspace
