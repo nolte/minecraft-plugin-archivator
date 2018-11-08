@@ -52,7 +52,7 @@ aliases:
     run:
       name: Load the Latest GH Release
       command: |
-        LAST_VERSION="$(curl https://${GITHUB_TOKEN}@api.github.com/repos/nolte/minecraft-plugin-archivator/releases/latest | jq -r '.tag_name' )"
+        LAST_VERSION="$(curl https://${GITHUB_TOKEN}@api.github.com/repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/releases/latest | jq -r '.tag_name' )"
         echo $LAST_VERSION > /tmp/workspace/last_release.txt
 
   # Load one version behind the latest GitHub Release
@@ -62,7 +62,7 @@ aliases:
     run:
       name: Load the Previous GH Release
       command: |
-        PREVIOUS_VERSION="$(curl https://${GITHUB_TOKEN}@api.github.com/repos/nolte/minecraft-plugin-archivator/releases | jq -r '.[1].tag_name' )"
+        PREVIOUS_VERSION="$(curl https://${GITHUB_TOKEN}@api.github.com/repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/releases | jq -r '.[1].tag_name' )"
         echo $PREVIOUS_VERSION > /tmp/workspace/previous_release.txt
 
   - &run_task_configure_git
@@ -122,7 +122,7 @@ jobs:
           name: generate CHANGELOG.md
           command: |
             LAST_VERSION="$(cat /tmp/workspace/last_release.txt)"
-            docker run -it --rm -v "$(pwd)":/usr/local/src/your-app ferrarimarco/github-changelog-generator:1.15.0.pre.beta --user nolte --project minecraft-plugin-archivator --token ${GITHUB_TOKEN} --since-tag $LAST_VERSION
+            docker run -it --rm -v "$(pwd)":/usr/local/src/your-app ferrarimarco/github-changelog-generator:1.15.0.pre.beta --user ${CIRCLE_PROJECT_USERNAME} --project ${CIRCLE_PROJECT_REPONAME} --token ${GITHUB_TOKEN} --since-tag $LAST_VERSION
 
       - store_artifacts:
           path: /tmp/workspace
