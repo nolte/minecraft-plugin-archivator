@@ -55,10 +55,6 @@ jobs:
 
       - run: mvn -B gitflow:release-finish -DpushRemote=true -DallowSnapshots=true
 
-
-
-
-
   start-release:
     docker:
       - image: circleci/openjdk:8-jdk
@@ -118,8 +114,7 @@ jobs:
               --file /tmp/workspace/buildArtefacts/minecraft-backup-archiver-${current_version}-shaded.jar
 
   releaseplayground:
-    docker:
-      - image: circleci/golang:1.8
+    <<: *container_releasemanager
     steps:
       - attach_workspace:
           at: /tmp/workspace
@@ -187,16 +182,11 @@ jobs:
       - store_artifacts:
           path: /tmp/workspace/current_version.txt
 
-      # Persist the specified paths (workspace/echo-output) into the workspace for use in downstream job.
       - persist_to_workspace:
-          # Must be an absolute path, or relative path from working_directory. This is a directory on the container which is
-          # taken to be the root directory of the workspace.
           root: /tmp/workspace
-          # Must be relative path from root
           paths:
               - buildArtefacts
               - current_version.txt
-
 
       - run:
           name: Save test results
@@ -204,6 +194,7 @@ jobs:
             mkdir -p /tmp/junit/
             find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} /tmp/junit/ \;
           when: always
+
       - store_test_results:
           path: /tmp/junit
 
