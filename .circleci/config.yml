@@ -61,7 +61,7 @@ jobs:
     machine: true
     working_directory: /tmp/workspace
     steps:
-      . run: |
+      - run: |
           apt-get install jq
 
       - run: |
