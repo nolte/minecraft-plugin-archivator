@@ -19,7 +19,7 @@ aliases:
       sudo wget https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 -O /usr/bin/jq
       sudo chmod +x /usr/bin/jq
       LAST_VERSION="$(curl https://${GITHUB_TOKEN}@api.github.com/repos/nolte/minecraft-plugin-archivator/releases/latest | jq -r '.tag_name' )"
-      export $LAST_VERSION
+      export LAST_VERSION=$LAST_VERSION
 
 
 jobs:
