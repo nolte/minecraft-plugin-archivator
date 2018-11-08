@@ -62,7 +62,7 @@ jobs:
     working_directory: /tmp/workspace
     steps:
       - run: |
-          sudo wget https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 /usr/bin/jq
+          sudo wget https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 -O /usr/bin/jq
           sudo chmod +x /usr/bin/jq
           LAST_VERSION="$(curl https://${GITHUB_TOKEN}@api.github.com/repos/nolte/minecraft-plugin-archivator/releases/latest | jq -r \".tag_name\" )"
           echo $LAST_VERSION
