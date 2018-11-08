@@ -61,6 +61,9 @@ jobs:
     machine: true
     working_directory: /tmp/workspace
     steps:
+      . run: |
+          apt-get install jq
+
       - run: |
           docker run -it --rm -v "$(pwd)":/usr/local/src/your-app ferrarimarco/github-changelog-generator:1.15.0.pre.beta --user nolte --project minecraft-plugin-archivator --token ${GITHUB_TOKEN}
 
@@ -105,6 +108,7 @@ jobs:
             ls -all /tmp/workspace
             message="$(cat /tmp/workspace/CHANGELOG.md)"
             current_version="$(cat /tmp/workspace/current_version.txt)"
+
             github-release release \
               --user ${CIRCLE_PROJECT_USERNAME} \
               --repo ${CIRCLE_PROJECT_REPONAME} \
