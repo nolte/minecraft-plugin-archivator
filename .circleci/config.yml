@@ -40,7 +40,7 @@ aliases:
   # used for better JSon Command Line parsing.
   - &run_task_prepare_jq
     run:
-      name: "install jq to path"
+      name: install jq to path
       command: |
         sudo wget https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 -O /usr/bin/jq
         sudo chmod +x /usr/bin/jq
@@ -50,7 +50,7 @@ aliases:
   # @see https://developer.github.com/v3/repos/releases/#get-the-latest-release
   - &run_task_load_latest_ghrelease
     run:
-      name: "Load the Latest GH Release"
+      name: Load the Latest GH Release
       command: |
         LAST_VERSION="$(curl https://${GITHUB_TOKEN}@api.github.com/repos/nolte/minecraft-plugin-archivator/releases/latest | jq -r '.tag_name' )"
         echo $LAST_VERSION > /tmp/workspace/last_release.txt
@@ -130,7 +130,7 @@ jobs:
           at: /tmp/workspace
 
       - run:
-          name: "Publish the jar on GitHub"
+          name: Publish the jar on GitHub
           command: |
             go get github.com/aktau/github-release
             current_version="$(cat /tmp/workspace/current_version.txt)"
