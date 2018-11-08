@@ -62,7 +62,7 @@ jobs:
     working_directory: /tmp/workspace
     steps:
       - run: |
-          apt-get install jq
+          sudo apt-get install jq
 
       - run: |
           docker run -it --rm -v "$(pwd)":/usr/local/src/your-app ferrarimarco/github-changelog-generator:1.15.0.pre.beta --user nolte --project minecraft-plugin-archivator --token ${GITHUB_TOKEN}
