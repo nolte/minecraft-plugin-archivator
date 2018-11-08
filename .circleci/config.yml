@@ -10,6 +10,14 @@ defaults: &defaults
 aliases:
   # Variables.
   # For YAML support of anchors and references, @see http://blog.daemonl.com/2016/02/yaml.html
+
+  - &deploy_ssh_fingerprint "2a:3b:9b:1d:ff:0c:ce:c3:28:8e:5e:74:07:fa:fe:3c"
+
+  - &run_task_add_key
+    add_ssh_keys:
+      fingerprints:
+        - *deploy_ssh_fingerprint
+
   - &container_releasemanager
     docker:
       - image: circleci/golang:1.8
@@ -20,6 +28,13 @@ aliases:
       sudo chmod +x /usr/bin/jq
       LAST_VERSION="$(curl https://${GITHUB_TOKEN}@api.github.com/repos/nolte/minecraft-plugin-archivator/releases/latest | jq -r '.tag_name' )"
       echo $LAST_VERSION > /tmp/workspace/last_release.txt
+
+  - &run_task_configure_git
+    run: |
+      git config --global user.email "$GIT_AUTHOR_EMAIL"
+      git config --global user.name "$GIT_AUTHOR_NAME"
+
+
 
 jobs:
 
@@ -32,16 +47,14 @@ jobs:
       MAVEN_OPTS: -Xmx3200m
 
     steps:
-      - add_ssh_keys:
-          fingerprints:
-            - "2a:3b:9b:1d:ff:0c:ce:c3:28:8e:5e:74:07:fa:fe:3c"
+      - *run_task_add_key
 
       - checkout
 
-      - run: |
-          git config --global user.email "$GIT_AUTHOR_EMAIL"
-          git config --global user.name "$GIT_AUTHOR_NAME"
-          mvn -B gitflow:release-finish -DpushRemote=true -DallowSnapshots=true
+      - *run_task_configure_git
+
+      - run: mvn -B gitflow:release-finish -DpushRemote=true -DallowSnapshots=true
+
 
 
 
@@ -65,9 +78,8 @@ jobs:
 
       - checkout
 
+      - *run_task_configure_git
       - run: |
-          git config --global user.email "$GIT_AUTHOR_EMAIL"
-          git config --global user.name "$GIT_AUTHOR_NAME"
           mvn -B gitflow:release-start -DpushRemote=true -DallowSnapshots=true
 
 
