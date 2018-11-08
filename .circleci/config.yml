@@ -22,10 +22,13 @@ aliases:
     docker:
       - image: circleci/golang:1.8
 
-  - &run_task_load_latest_ghrelease
+  - &run_task_prepare_jq
     run: |
       sudo wget https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 -O /usr/bin/jq
       sudo chmod +x /usr/bin/jq
+
+  - &run_task_load_latest_ghrelease
+    run: |
       LAST_VERSION="$(curl https://${GITHUB_TOKEN}@api.github.com/repos/nolte/minecraft-plugin-archivator/releases/latest | jq -r '.tag_name' )"
       echo $LAST_VERSION > /tmp/workspace/last_release.txt
 
@@ -81,6 +84,7 @@ jobs:
     machine: true
     working_directory: /tmp/workspace
     steps:
+      - *run_task_prepare_jq
       - *run_task_load_latest_ghrelease
       - run: |
           LAST_VERSION="$(cat /tmp/workspace/last_release.txt)"
