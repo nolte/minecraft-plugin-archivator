@@ -15,9 +15,11 @@ aliases:
       - image: circleci/golang:1.8
 
   - &run_task_load_latest_ghrelease
-    sudo wget https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 -O /usr/bin/jq
-    sudo chmod +x /usr/bin/jq
-    LAST_VERSION="$(curl https://${GITHUB_TOKEN}@api.github.com/repos/nolte/minecraft-plugin-archivator/releases/latest | jq -r '.tag_name' )"
+    run: |
+      sudo wget https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 -O /usr/bin/jq
+      sudo chmod +x /usr/bin/jq
+      LAST_VERSION="$(curl https://${GITHUB_TOKEN}@api.github.com/repos/nolte/minecraft-plugin-archivator/releases/latest | jq -r '.tag_name' )"
+      export $LAST_VERSION
 
 
 jobs:
@@ -74,9 +76,10 @@ jobs:
     machine: true
     working_directory: /tmp/workspace
     steps:
+      - *run_task_load_latest_ghrelease
       - run: |
-          <<: *run_task_load_latest_ghrelease
-          
+
+
           docker run -it --rm -v "$(pwd)":/usr/local/src/your-app ferrarimarco/github-changelog-generator:1.15.0.pre.beta --user nolte --project minecraft-plugin-archivator --token ${GITHUB_TOKEN} --since-tag $LAST_VERSION
 
       - store_artifacts:
