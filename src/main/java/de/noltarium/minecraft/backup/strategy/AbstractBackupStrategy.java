@@ -49,8 +49,7 @@ public abstract class AbstractBackupStrategy<T extends ArchiveBaseFolderPreparat
 		try {
 			archive = archiving.archiveFiles(filesForArchive, backup.getBackupRunId());
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			throw new RuntimeException(e1);
 		}
 
 		finalyProcessStep();
@@ -58,8 +57,7 @@ public abstract class AbstractBackupStrategy<T extends ArchiveBaseFolderPreparat
 		try {
 			folderPreparation.cleanupOldArchives();
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			throw new RuntimeException(e1);
 		}
 
 		backup.setEndTime(OffsetDateTime.now(ZoneOffset.UTC));
