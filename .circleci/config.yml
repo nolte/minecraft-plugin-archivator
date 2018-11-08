@@ -73,8 +73,8 @@ jobs:
       - checkout
 
       - *run_task_configure_git
-      - run: |
-          mvn -B gitflow:release-start -DpushRemote=true -DallowSnapshots=true
+
+      - run: mvn -B gitflow:release-start -DpushRemote=true -DallowSnapshots=true
 
 
   generate-changelog:
@@ -168,7 +168,6 @@ jobs:
           mkdir -p /tmp/workspace/
           echo $MVN_VERSION > /tmp/workspace/current_version.txt
 
-
       - run:
           name: Save test results
           command: |
@@ -260,23 +259,3 @@ workflows:
           filters:
             branches:
               only: /master/
-
-#  build-deploy:
-#    jobs:
-#      - generate-changelog:
-#          filters:
-#            tags:
-#              only: /.*/
-#      - build:
-#          filters:
-#            tags:
-#              only: /.*/
-#      - publish-github-release:
-#          requires:
-#            - build
-#            - generate-changelog
-#          filters:
-#            tags:
-#              only: /^v.*/
-#            branches:
-#              ignore: /.*/
