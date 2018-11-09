@@ -177,6 +177,19 @@ jobs:
     steps:
       - checkout
 
+      # https://docs.codeclimate.com/docs/circle-ci-test-coverage-example
+      - run:
+          name: Setup dependencies
+          command: |
+            sudo composer self-update
+            composer install -n --prefer-dist
+      - run:
+          name: Setup Code Climate test-reporter
+          command: |
+          # download test reporter as a static binary
+            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+            chmod +x ./cc-test-reporter
+
       # Download and cache dependencies
       - restore_cache:
           keys:
@@ -192,7 +205,14 @@ jobs:
           key: v1-dependencies-{{ checksum "pom.xml" }}
 
       # run tests!
+
       - run: mvn integration-test
+      - run:
+          name: Run tests
+          command: |
+            ./cc-test-reporter before-build
+            mvn integration-test
+            ./cc-test-reporter after-build --coverage-input-type clover --exit-code $?
 
       - *run_task_mvn_extract_version_from_pom
 
