@@ -207,7 +207,7 @@ jobs:
           command: |
             ./cc-test-reporter before-build
             mvn integration-test
-            ./cc-test-reporter after-build --coverage-input-type jacoco --exit-code $?
+            ./cc-test-reporter after-build --coverage-input-type jacoco --exit-code $? target/jacoco.exec
 
       - *run_task_mvn_extract_version_from_pom
 
