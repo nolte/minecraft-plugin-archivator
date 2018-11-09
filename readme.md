@@ -11,6 +11,8 @@ The Next Minecraft Backup Plugin.
 |[![CodeFactor](https://www.codefactor.io/repository/github/nolte/minecraft-plugin-archivator/badge/develop)](https://www.codefactor.io/repository/github/nolte/minecraft-plugin-archivator/overview/develop) | [codefactor.io](https://www.codefactor.io) used for static code analysing |
 | [![Maintainability](https://api.codeclimate.com/v1/badges/695284e2c85bdbc781a9/maintainability)](https://codeclimate.com/github/nolte/minecraft-plugin-archivator/maintainability) | [codeclimate.com](https://codeclimate.com) using for static code analysing |
 | [![Test Coverage](https://api.codeclimate.com/v1/badges/695284e2c85bdbc781a9/test_coverage)](https://codeclimate.com/github/nolte/minecraft-plugin-archivator/test_coverage) | present the [jacoco](https://www.jacoco.org/jacoco/) calculated Test Converage |
+| [![Dependabot](https://img.shields.io/badge/dependabot-enabled-blue.svg)]() | Check Dependencies |
+
 
 ## Commands
 
