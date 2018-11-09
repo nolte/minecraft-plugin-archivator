@@ -201,14 +201,13 @@ jobs:
 
       # run tests!
 
-      - run: mvn integration-test
+      - run: mvn integration-test jacoco:report
       - run:
           name: Run tests
           command: |
             JACOCO_SOURCE_PATH=src/main/java ./cc-test-reporter \
               format-coverage target/site/jacoco/jacoco.xml     \
               --input-type jacoco
-            mvn integration-test jacoco:report
             ./cc-test-reporter upload-coverage
 
 
