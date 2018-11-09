@@ -1,9 +1,16 @@
 # Archivator
 
-**Build Status** *(master branch)* **:**
-[![CircleCI](https://circleci.com/gh/nolte/minecraft-plugin-archivator.svg?style=svg)](https://circleci.com/gh/nolte/minecraft-plugin-archivator) [![Build Status](https://travis-ci.org/nolte/minecraft-plugin-archivator.svg?branch=master)](https://travis-ci.org/nolte/minecraft-plugin-archivator) [![Total alerts](https://img.shields.io/lgtm/alerts/g/nolte/minecraft-plugin-archivator.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/nolte/minecraft-plugin-archivator/alerts/) [![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/nolte/minecraft-plugin-archivator.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/nolte/minecraft-plugin-archivator/context:java) [![CodeFactor](https://www.codefactor.io/repository/github/nolte/minecraft-plugin-archivator/badge/develop)](https://www.codefactor.io/repository/github/nolte/minecraft-plugin-archivator/overview/develop)
-[![Maintainability](https://api.codeclimate.com/v1/badges/695284e2c85bdbc781a9/maintainability)](https://codeclimate.com/github/nolte/minecraft-plugin-archivator/maintainability)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/695284e2c85bdbc781a9/test_coverage)](https://codeclimate.com/github/nolte/minecraft-plugin-archivator/test_coverage)
+The Next Minecraft Backup Plugin.
+
+## External used Services
+
+| Command               |                     Description |
+|-----------------------|---------------------------------|
+| [![CircleCI](https://circleci.com/gh/nolte/minecraft-plugin-archivator.svg?style=svg)](https://circleci.com/gh/nolte/minecraft-plugin-archivator) | [circleci.com](https://circleci.com) used for Release Management, and CI |
+| [![Build Status](https://travis-ci.org/nolte/minecraft-plugin-archivator.svg?branch=develop)](https://travis-ci.org/nolte/minecraft-plugin-archivator) | [travis-ci.org](https://travis-ci.org) used for Plain CI  |
+|[![CodeFactor](https://www.codefactor.io/repository/github/nolte/minecraft-plugin-archivator/badge/develop)](https://www.codefactor.io/repository/github/nolte/minecraft-plugin-archivator/overview/develop) | [codefactor.io](https://www.codefactor.io) used for static code analysing |
+| [![Maintainability](https://api.codeclimate.com/v1/badges/695284e2c85bdbc781a9/maintainability)](https://codeclimate.com/github/nolte/minecraft-plugin-archivator/maintainability) | [codeclimate.com](https://codeclimate.com) using for static code analysing |
+| [![Test Coverage](https://api.codeclimate.com/v1/badges/695284e2c85bdbc781a9/test_coverage)](https://codeclimate.com/github/nolte/minecraft-plugin-archivator/test_coverage) | present the [jacoco](https://www.jacoco.org/jacoco/) calculated Test Converage |
 
 ## Commands
 
