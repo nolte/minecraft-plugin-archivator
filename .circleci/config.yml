@@ -205,9 +205,12 @@ jobs:
       - run:
           name: Run tests
           command: |
-            ./cc-test-reporter before-build
-            mvn integration-test
-            ./cc-test-reporter after-build --coverage-input-type jacoco --exit-code $? target/jacoco.exec
+            JACOCO_SOURCE_PATH=src/main/java ./cc-test-reporter \
+              format-coverage target/site/jacoco/jacoco.xml     \
+              --input-type jacoco
+            mvn integration-test jacoco:report
+            ./cc-test-reporter upload-coverage
+
 
       - *run_task_mvn_extract_version_from_pom
 
