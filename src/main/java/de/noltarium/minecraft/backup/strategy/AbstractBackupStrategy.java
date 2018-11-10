@@ -47,7 +47,8 @@ public abstract class AbstractBackupStrategy<T extends ArchiveBaseFolderPreparat
 		List<File> filesForArchive = execute();
 		File archive = null;
 		try {
-			archive = archiving.archiveFiles(filesForArchive, backup.getBackupRunId());
+			archive = archiving.archiveFiles(filesForArchive, folderPreparation.getArchiveBase().toFile(),
+					backup.getBackupRunId());
 		} catch (IOException e1) {
 			throw new RuntimeException(e1);
 		}

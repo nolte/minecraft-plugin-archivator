@@ -13,6 +13,7 @@ import de.noltarium.minecraft.backup.strategy.SaftyBackupStrategy;
 import de.noltarium.minecraft.chat.ChatNotification;
 import de.noltarium.minecraft.database.DatabaseFacade;
 import de.noltarium.minecraft.database.model.BackupEntity;
+import de.noltarium.minecraft.utils.FileCompress;
 
 public class BackupRunnable implements Runnable {
 
@@ -48,14 +49,14 @@ public class BackupRunnable implements Runnable {
 		case DIRECT:
 			ArchiveBaseFolderPreparation folderPrep = new ArchiveBaseFolderPreparation(config.getBackupArchivePath(),
 					cleanService);
-			ArchivingStep archiving = new ArchivingStep(folderPrep, config.getArchiveType());
+			ArchivingStep archiving = new ArchivingStep(config.getArchiveType(), new FileCompress());
 
 			backupStrategy = new DirectBackupStrategy(backupEntity, archiving, folderPrep);
 			break;
 		case SAFTY:
 			ArchiveTempBaseFolderPreparation folderTmpPrep = new ArchiveTempBaseFolderPreparation(
 					config.getBackupArchivePath(), config.getBackupWorkingPath(), cleanService);
-			ArchivingStep archivingWithTmp = new ArchivingStep(folderTmpPrep, config.getArchiveType());
+			ArchivingStep archivingWithTmp = new ArchivingStep(config.getArchiveType(), new FileCompress());
 			backupStrategy = new SaftyBackupStrategy(backupEntity, archivingWithTmp, folderTmpPrep);
 			break;
 		default:

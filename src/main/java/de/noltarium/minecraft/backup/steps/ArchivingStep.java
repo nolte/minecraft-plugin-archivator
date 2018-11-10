@@ -7,36 +7,38 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import de.noltarium.minecraft.Archivator;
 import de.noltarium.minecraft.utils.ArchiveType;
 import de.noltarium.minecraft.utils.FileCompress;
+import lombok.extern.java.Log;
 import net.steppschuh.markdowngenerator.text.emphasis.BoldText;
 import net.steppschuh.markdowngenerator.text.emphasis.ItalicText;
 import net.steppschuh.markdowngenerator.text.heading.Heading;
 
+@Log
 public class ArchivingStep {
 
 	private final ArchiveType archive_type;
 
+	private final FileCompress compressor;
+
 	private File archive;
 
-	private final ArchiveBaseFolderPreparation archiveBase;
-
-	public ArchivingStep(ArchiveBaseFolderPreparation archiveBase, ArchiveType archive_type) {
-		this.archiveBase = archiveBase;
+	public ArchivingStep(ArchiveType archive_type, FileCompress compressorService) {
 		this.archive_type = archive_type;
+		this.compressor = compressorService;
 	}
 
-	public File archiveFiles(List<File> files, String archiveId) throws IOException {
+	public File archiveFiles(List<File> files, File archivedFolder, String archiveId) throws IOException {
+		if (archivedFolder.isDirectory()) {
+			String destZipFile = archivedFolder.getPath() + "/" + archiveId + "." + archive_type.getExtention();
+			return archiveFiles(files, new File(destZipFile));
+		} else {
+			throw new IllegalArgumentException("The ArchiveFolder is not a directory:" + archivedFolder.getPath());
+		}
+	}
 
-		String destZipFile = archiveBase.getArchiveBase().toString() + "/" + archiveId + "."
-				+ archive_type.getExtention();
-		Archivator.getPlugin().getLogger().info("Creating backup Archive" + destZipFile);
+	public File archiveFiles(List<File> files, File archivedBackup) throws IOException {
 
-		// Crate a archive
-		Archivator.getPlugin().getLogger().info("Creating backup Archive" + files.size());
-		FileCompress compressor = new FileCompress();
-		File archivedBackup = new File(destZipFile);
 		archive = compressor.compressFiles(files, archivedBackup, archive_type);
 		return archive;
 

@@ -48,7 +48,6 @@ public class ArchiveBaseFolderPreparation implements BackupStep {
 					.collect(Collectors.toList());
 
 			// TODO Mark the removed archives at the database
-
 		}
 
 		return cleanedFiles;
