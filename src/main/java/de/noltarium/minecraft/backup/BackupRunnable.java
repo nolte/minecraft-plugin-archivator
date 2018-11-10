@@ -1,7 +1,10 @@
 package de.noltarium.minecraft.backup;
 
+import java.util.Optional;
+
 import de.noltarium.minecraft.backup.model.BackupProcessStrategyType;
 import de.noltarium.minecraft.backup.steps.ArchiveBaseFolderPreparation;
+import de.noltarium.minecraft.backup.steps.ArchiveFolderCleanService;
 import de.noltarium.minecraft.backup.steps.ArchiveTempBaseFolderPreparation;
 import de.noltarium.minecraft.backup.steps.ArchivingStep;
 import de.noltarium.minecraft.backup.strategy.AbstractBackupStrategy;
@@ -34,17 +37,24 @@ public class BackupRunnable implements Runnable {
 		BackupProcessStrategyType type = config.getBackupStrategy();
 
 		AbstractBackupStrategy<?> backupStrategy = null;
+
+		Optional<ArchiveFolderCleanService> cleanService = Optional.empty();
+		// only clean the archive if a max keeped size configured
+		if (config.getMaxKeepedBackups() != null && config.getMaxKeepedBackups() > 0) {
+			cleanService = Optional.of(new ArchiveFolderCleanService(config.getMaxKeepedBackups()));
+		}
+
 		switch (type) {
 		case DIRECT:
 			ArchiveBaseFolderPreparation folderPrep = new ArchiveBaseFolderPreparation(config.getBackupArchivePath(),
-					config.getMaxKeepedBackups());
+					cleanService);
 			ArchivingStep archiving = new ArchivingStep(folderPrep, config.getArchiveType());
 
 			backupStrategy = new DirectBackupStrategy(backupEntity, archiving, folderPrep);
 			break;
 		case SAFTY:
 			ArchiveTempBaseFolderPreparation folderTmpPrep = new ArchiveTempBaseFolderPreparation(
-					config.getBackupArchivePath(), config.getBackupWorkingPath(), config.getMaxKeepedBackups());
+					config.getBackupArchivePath(), config.getBackupWorkingPath(), cleanService);
 			ArchivingStep archivingWithTmp = new ArchivingStep(folderTmpPrep, config.getArchiveType());
 			backupStrategy = new SaftyBackupStrategy(backupEntity, archivingWithTmp, folderTmpPrep);
 			break;

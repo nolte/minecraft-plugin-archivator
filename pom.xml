@@ -28,6 +28,8 @@
 		<cron-utils.version>7.0.6</cron-utils.version>
 		<lombok.version>1.18.4</lombok.version>
 		<junit.version>4.12</junit.version>
+		<powermock.version>1.7.1</powermock.version>
+
 	</properties>
 
 	<dependencies>
@@ -103,6 +105,7 @@
 			<version>2.23.0</version>
 			<scope>test</scope>
 		</dependency>
+
 		<dependency>
 			<groupId>org.hamcrest</groupId>
 			<artifactId>hamcrest-all</artifactId>

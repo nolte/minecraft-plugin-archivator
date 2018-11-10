@@ -4,14 +4,14 @@ import static de.noltarium.minecraft.utils.FolderUtil.createFolderIfNotExists;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import de.noltarium.minecraft.backup.steps.ArchiveFolderCleanService.FileDeleteState;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NonNull;
@@ -25,7 +25,7 @@ public class ArchiveBaseFolderPreparation implements BackupStep {
 	@NonNull
 	final Path archiveBase;
 
-	final Integer maxReleases;
+	final Optional<ArchiveFolderCleanService> cleanService;
 
 	@Override
 	public void execute() {
@@ -35,23 +35,19 @@ public class ArchiveBaseFolderPreparation implements BackupStep {
 	public List<File> cleanupOldArchives() throws IOException {
 		log.info("Start cleaning archive folder");
 		List<File> cleanedFiles = new ArrayList<>();
-		if (maxReleases != null && maxReleases > 0) {
-			List<File> backups = Arrays.asList(archiveBase.toFile().listFiles()).parallelStream()
-					.filter(e -> !e.getPath().endsWith(".md")).sorted(Comparator.comparingLong(File::lastModified))
+		if (cleanService.isPresent()) {
+			// find all files in the archive
+			List<File> asList = Arrays.asList(archiveBase.toFile().listFiles());
+
+			// remove old archived files
+			List<FileDeleteState> cleaned = cleanService.get().cleanFolders(asList.parallelStream())
 					.collect(Collectors.toList());
 
-			File[] files = archiveBase.toFile().listFiles();
-			Arrays.sort(files, Comparator.comparingLong(File::lastModified).reversed());
+			// success full removed
+			cleanedFiles = cleaned.parallelStream().filter(file -> file.isRemoved()).map(file -> file.getFile())
+					.collect(Collectors.toList());
 
-			int backupDiff = backups.size() - maxReleases;
-			log.info("existing backups:" + backups.size());
-			if (backupDiff > 0)
-				for (int i = 0; i < backupDiff; i++) {
-					File file = backups.get(i);
-					log.info("Remove: " + file.getPath());
-					Files.delete(file.toPath());
-					cleanedFiles.add(file);
-				}
+			// TODO Mark the removed archives at the database
 
 		}
 

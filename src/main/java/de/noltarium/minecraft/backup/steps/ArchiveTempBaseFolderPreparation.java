@@ -3,6 +3,7 @@ package de.noltarium.minecraft.backup.steps;
 import static de.noltarium.minecraft.utils.FolderUtil.createFolderIfNotExists;
 
 import java.nio.file.Path;
+import java.util.Optional;
 
 import lombok.Data;
 import lombok.NonNull;
@@ -13,8 +14,9 @@ public class ArchiveTempBaseFolderPreparation extends ArchiveBaseFolderPreparati
 	@NonNull
 	private final Path tempBaseDir;
 
-	public ArchiveTempBaseFolderPreparation(Path archiveBase, Path tempBaseDir, Integer maxKeepedBackups) {
-		super(archiveBase, maxKeepedBackups);
+	public ArchiveTempBaseFolderPreparation(Path archiveBase, Path tempBaseDir,
+			Optional<ArchiveFolderCleanService> cleanService) {
+		super(archiveBase, cleanService);
 		this.tempBaseDir = tempBaseDir;
 	}
 
