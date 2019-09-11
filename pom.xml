@@ -26,7 +26,7 @@
 		<sqlite-jdbc.version>3.25.2</sqlite-jdbc.version>
 		<flyway-core.version>4.2.0</flyway-core.version>
 		<cron-utils.version>7.0.6</cron-utils.version>
-		<lombok.version>1.18.8</lombok.version>
+		<lombok.version>1.18.10</lombok.version>
 		<junit.version>4.12</junit.version>
 		<powermock.version>1.7.1</powermock.version>
 
